@@ -39,7 +39,8 @@
       "Beamline|V2": [
         {
           "d": "250419",
-          "t": "교체"
+          "t": "교체",
+          "memo": "d"
         }
       ],
       "Chamber|PEF": [
@@ -50,7 +51,5 @@
       ]
     }
   },
-  "cryo": {},
-  "updatedAt": "2026-11-06T12:52:45.064Z",
-  "updatedBy": "jg5.kang@gmail.com"
+  "cryo": {}
 }
