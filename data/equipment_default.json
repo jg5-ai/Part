@@ -149,7 +149,7 @@
       {
         "id": "p_hcc_1",
         "area": "Beamline",
-        "item": "AMU G/P"
+        "item": "AMU"
       },
       {
         "id": "p_mw4yikijx0z3",
@@ -214,6 +214,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:38:57.801Z",
+  "updatedAt": "2026-11-06T12:39:00.417Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
