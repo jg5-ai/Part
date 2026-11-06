@@ -154,7 +154,7 @@
       {
         "id": "p_mw4yikijx0z3",
         "area": "Beamline",
-        "item": "Corrector Graphite"
+        "item": "Corrector G/P"
       }
     ],
     "LE": [
@@ -194,6 +194,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:34:58.941Z",
+  "updatedAt": "2026-11-06T12:35:05.215Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
