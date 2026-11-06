@@ -118,6 +118,10 @@
     {
       "name": "IAE3802",
       "prc": "HE"
+    },
+    {
+      "name": "IVV3722_2",
+      "prc": "HE"
     }
   ],
   "parts": {
@@ -165,6 +169,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:32:42.384Z",
+  "updatedAt": "2026-11-06T12:32:56.614Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
