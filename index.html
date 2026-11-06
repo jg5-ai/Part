@@ -6,15 +6,17 @@
 <title>파트 이력 관리 시스템</title>
 <style>
 :root{
-  --bg:#f3f5f9; --card:#fff; --line:#dde2ea; --line2:#eef1f5; --text:#1f2933; --sub:#6b7785;
+  --bg:#f3f5f9; --card:#fff; --line:#d5dbe4; --line2:#e8ecf1; --text:#1f2933; --sub:#64707f;
+  --grid:#9aa6b6; --grid-head:#7f8b9c;
   --pri:#2563eb; --pri-d:#1d4ed8; --pri-soft:#e8f0fe;
-  --rep:#e8f7ee; --rep-t:#17663a; --cln:#e8f0ff; --cln-t:#1d4ed8;
+  --rep:#e3f6ea; --rep-t:#14653a; --cln:#e3edff; --cln-t:#1d4ed8;
   --green:#22c55e; --yellow:#f59e0b; --red:#ef4444; --grey:#9ca3af; --danger:#dc2626;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 button{font-family:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:8px;padding:7px 12px;transition:.15s}
 button:hover{border-color:#b8c2d0;background:#f8fafc}
+button:disabled{opacity:.4;cursor:default}
 button.pri{background:var(--pri);border-color:var(--pri);color:#fff}
 button.pri:hover{background:var(--pri-d)}
 button.danger{background:#fff;border-color:#f3b4b4;color:var(--danger)}
@@ -25,10 +27,10 @@ input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-
 
 /* ---------- 헤더 ---------- */
 header{background:#1e293b;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:40;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.3px}
-.sync{margin-left:auto;display:flex;align-items:center;gap:9px;background:#0f172a;border:1px solid #334155;border-radius:999px;padding:6px 14px 6px 10px;font-size:12.5px;cursor:pointer;user-select:none;min-width:200px}
+header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.3px}
+.sync{margin-left:auto;display:flex;align-items:center;gap:9px;background:#0f172a;border:1px solid #334155;border-radius:999px;padding:6px 14px 6px 10px;font-size:13px;cursor:pointer;user-select:none;min-width:200px}
 .light{display:flex;gap:4px;background:#020617;padding:3px 5px;border-radius:999px}
-.light i{width:10px;height:10px;border-radius:50%;background:#334155;display:block;transition:.2s}
+.light i{width:11px;height:11px;border-radius:50%;background:#334155;display:block;transition:.2s}
 .sync[data-s=ok] .light .g{background:var(--green);box-shadow:0 0 7px var(--green)}
 .sync[data-s=busy] .light .y{background:var(--yellow);box-shadow:0 0 7px var(--yellow);animation:blink .8s infinite}
 .sync[data-s=changed] .light .y{background:var(--yellow);box-shadow:0 0 9px var(--yellow);animation:blink .45s 8}
@@ -42,83 +44,100 @@ header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.3px}
 
 /* ---------- 카테고리 ---------- */
 .cats{display:flex;gap:8px;padding:14px 20px 0;flex-wrap:wrap}
-.cat{padding:10px 20px;font-size:14px;font-weight:600;border-radius:10px;background:#fff;border:1px solid var(--line);color:#475569;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.cat{padding:10px 22px;font-size:15px;font-weight:700;border-radius:10px;background:#fff;border:1px solid var(--line);color:#475569;box-shadow:0 1px 0 rgba(0,0,0,.03)}
 .cat.on{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);transform:translateY(1px)}
 main{padding:14px 20px 40px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 
 /* ---------- 설비 선택 ---------- */
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.toolbar button{font-size:13.5px;font-weight:600}
 .toolbar .info{margin-left:auto;color:var(--sub);font-size:12px}
 .prcgrp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0;border-top:1px dashed var(--line2)}
-.prcgrp:first-of-type{border-top:none}
-.prclabel{min-width:70px;font-weight:700;font-size:12.5px;color:#334155;background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:5px 8px;text-align:center}
+.prcgrp:first-child{border-top:none}
+.prclabel{min-width:74px;font-weight:700;font-size:13px;color:#334155;background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:6px 8px;text-align:center}
 .prclabel.on{background:#334155;color:#fff;border-color:#334155}
-.eqbtn{font-weight:600;min-width:92px}
+.eqbtn{font-weight:700;min-width:96px;font-size:13.5px}
 .eqbtn.on{background:var(--pri);color:#fff;border-color:var(--pri);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)}
 
 /* ---------- 메인 테이블 ---------- */
-.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
-table.ph{border-collapse:collapse;width:100%;min-width:980px;font-size:13px}
-table.ph th{background:#f1f5f9;color:#334155;font-weight:700;padding:8px 6px;border:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
-table.ph td{border:1px solid var(--line);padding:0;height:36px;text-align:center;white-space:nowrap}
-table.ph td.eqn{font-weight:700;background:#fafbfd;padding:0 10px}
-table.ph td.area{padding:0 10px;color:#334155;background:#fcfcfe}
-table.ph td.item{padding:0 10px;font-weight:600;cursor:pointer;position:relative;color:#0f172a}
-table.ph td.item:hover{background:#fff7e6;color:#b45309}
-table.ph td.item:hover::after{content:"클릭 → 오늘 교체";position:absolute;left:50%;top:-22px;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:500;pointer-events:none;z-index:5}
-.more{display:inline-block;margin-left:6px;font-size:10.5px;background:#fde68a;color:#92400e;border-radius:9px;padding:0 6px;font-weight:700}
-table.ph td.d{min-width:84px;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px}
-table.ph td.d.rep{background:var(--rep);color:var(--rep-t);font-weight:600}
-table.ph td.d.cln{background:var(--cln);color:var(--cln-t);font-weight:600}
-table.ph td.d.latest{box-shadow:inset 0 0 0 2px rgba(37,99,235,.35)}
-table.ph td.d.rep:hover,table.ph td.d.cln:hover{filter:brightness(.94)}
-table.ph td.d.empty{color:transparent}
-table.ph td.d.empty:hover{background:#f8fafc;color:#94a3b8}
-table.ph td.d.empty::before{content:"+"}
-table.ph td.noparts{color:var(--sub);padding:0 12px;text-align:left}
-table.ph tr.eqstart td{border-top:2px solid #94a3b8}
-.legend{display:flex;gap:14px;align-items:center;color:var(--sub);font-size:12px;margin-top:10px;flex-wrap:wrap}
-.legend b{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px}
-.empty-state{padding:40px 10px;text-align:center;color:var(--sub)}
+.tblwrap{overflow-x:auto;border:2px solid var(--grid-head);border-radius:10px;background:#fff}
+table.ph{border-collapse:collapse;width:100%;min-width:1000px;font-size:15px;font-weight:600}
+table.ph th{background:#e2e8f0;color:#1e293b;font-weight:800;font-size:14.5px;padding:9px 6px;border:1px solid var(--grid-head);white-space:nowrap}
+table.ph th.latest-h{background:#fde68a;color:#78350f}
+table.ph td{border:1px solid var(--grid);padding:0 8px;height:40px;text-align:center;white-space:nowrap}
+table.ph td.eqn{font-weight:800;background:#f1f5f9;font-size:15.5px;color:#0f172a}
+table.ph td.area{color:#1e293b;background:#f8fafc;font-weight:700}
+table.ph td.item{font-weight:800;color:#0f172a}
+table.ph td.in{width:52px;padding:0 4px;background:#fafbff}
+.inbtn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:30px;padding:0;border:1.5px solid #93b4f5;background:#eef4ff;color:var(--pri);border-radius:8px}
+.inbtn:hover{background:var(--pri);color:#fff;border-color:var(--pri);transform:scale(1.06)}
+.inbtn svg{width:20px;height:20px}
+table.ph td.d{min-width:88px;font-variant-numeric:tabular-nums;font-size:15px;font-weight:700}
+table.ph td.d.rep{background:var(--rep);color:var(--rep-t)}
+table.ph td.d.cln{background:var(--cln);color:var(--cln-t)}
+table.ph td.d.latest{background:#fff1a8;box-shadow:inset 0 0 0 3px #f59e0b;font-weight:800}
+table.ph td.noparts{color:var(--sub);text-align:left;font-weight:500}
+table.ph tr.eqstart td{border-top:3px solid #475569}
+table.ph tbody tr:first-child td{border-top:1px solid var(--grid)}
+table.fixed{width:auto;min-width:0}
+table.fixed td.d,table.fixed th.dh{width:112px;min-width:112px;max-width:112px}
+table.ph td.in{min-width:52px}
+.inbtn,.modal .inbtn{flex-shrink:0;min-width:38px;padding:0}
+.legend{display:flex;gap:14px;align-items:center;color:var(--sub);font-size:12.5px;margin-top:10px;flex-wrap:wrap}
+.legend b{display:inline-block;width:15px;height:15px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.empty-state{padding:40px 10px;text-align:center;color:var(--sub);font-size:15px}
 .soon{padding:60px 20px;text-align:center;color:var(--sub);font-size:15px}
 .soon b{display:block;font-size:20px;color:#334155;margin-bottom:8px}
 
-/* ---------- 모달 ---------- */
+/* ---------- 모달 (글자 크게) ---------- */
 .ov{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .12s}
 @keyframes fade{from{opacity:0}}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:460px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.modal.wide{max-width:760px}
-.modal.xwide{max-width:96vw}
-.mh{padding:14px 18px;border-bottom:1px solid var(--line2);font-weight:700;font-size:15px;display:flex;align-items:center}
-.mh .x{margin-left:auto;border:none;font-size:18px;padding:0 6px;color:var(--sub);background:none}
-.mb{padding:16px 18px;overflow:auto}
-.mf{padding:12px 18px;border-top:1px solid var(--line2);display:flex;gap:8px;justify-content:flex-end}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.3);font-size:15px}
+.modal.wide{max-width:820px}
+.modal button{font-size:14.5px;padding:9px 16px}
+.modal button.sm{font-size:13.5px;padding:6px 12px}
+.modal input,.modal select{font-size:15px;padding:10px 12px}
+.mh{padding:15px 20px;border-bottom:1px solid var(--line2);font-weight:800;font-size:17px;display:flex;align-items:center}
+.mh .x{margin-left:auto;border:none;font-size:20px;padding:0 6px;color:var(--sub);background:none}
+.mb{padding:18px 20px;overflow:auto}
+.mf{padding:13px 20px;border-top:1px solid var(--line2);display:flex;gap:8px;justify-content:flex-end}
 .mf .left{margin-right:auto}
-.fld{margin-bottom:12px}
-.fld>label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px}
-.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.row input[type=text],.row input:not([type]){flex:1;min-width:120px}
-.hint{font-size:12px;color:var(--sub);margin-top:5px;min-height:16px}
+.fld{margin-bottom:14px}
+.fld>label{display:block;font-size:14px;font-weight:700;color:#334155;margin-bottom:6px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row input[type=text],.row input:not([type]){flex:1;min-width:130px}
+.hint{font-size:13.5px;color:var(--sub);margin-top:6px;min-height:18px}
 .hint.err{color:var(--danger)}
 .hint.okk{color:#15803d}
-.target{background:#f1f5f9;border-radius:8px;padding:9px 12px;font-weight:700;margin-bottom:14px;color:#334155}
-.seg{display:flex;gap:6px}
-.seg button{flex:1;padding:10px;font-weight:700;font-size:14px}
-.seg button.on[data-t="교체"]{background:var(--rep);border-color:#4ade80;color:var(--rep-t);box-shadow:inset 0 0 0 1px #4ade80}
-.seg button.on[data-t="CLN"]{background:var(--cln);border-color:#60a5fa;color:var(--cln-t);box-shadow:inset 0 0 0 1px #60a5fa}
-.sec{margin-bottom:18px}
-.sec h4{margin:0 0 8px;font-size:13px;color:#334155}
-table.mini{border-collapse:collapse;width:100%;font-size:13px}
-table.mini td,table.mini th{border-bottom:1px solid var(--line2);padding:5px 4px;text-align:left}
-table.mini th{font-size:12px;color:var(--sub);font-weight:600}
+.target{background:#f1f5f9;border:1px solid var(--line);border-radius:8px;padding:11px 14px;font-weight:800;font-size:16px;margin-bottom:16px;color:#1e293b}
+.seg{display:flex;gap:8px}
+.modal .seg button{flex:1;padding:11px;font-weight:800;font-size:15.5px}
+.seg button.on[data-t="교체"]{background:var(--rep);border-color:#4ade80;color:var(--rep-t);box-shadow:inset 0 0 0 1.5px #4ade80}
+.seg button.on[data-t="CLN"]{background:var(--cln);border-color:#60a5fa;color:var(--cln-t);box-shadow:inset 0 0 0 1.5px #60a5fa}
+.sec{margin-bottom:20px}
+.sec h4{margin:0 0 10px;font-size:15px;color:#1e293b;font-weight:800}
+table.mini{border-collapse:collapse;width:100%;font-size:15px}
+table.mini td,table.mini th{border-bottom:1px solid var(--line2);padding:6px 5px;text-align:left}
+table.mini th{font-size:13.5px;color:var(--sub);font-weight:700}
 table.mini input,table.mini select{width:100%}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.chip{background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:4px}
-.chip button{border:none;background:none;padding:0 5px;color:var(--sub);font-size:14px}
-.chip button:hover{color:var(--danger)}
-.note{font-size:12px;color:var(--sub);line-height:1.6}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fade .15s;max-width:90vw}
+table.mini tr.grp td{background:#f1f5f9;font-weight:800;font-size:14px;color:#334155;padding:7px 10px;border-top:2px solid #cbd5e1}
+td.drag{width:30px;cursor:grab;color:#94a3b8;font-size:20px;text-align:center;user-select:none}
+td.drag:hover{color:var(--pri)}
+tr.dragging{opacity:.45;background:#eef4ff}
+.hlist{border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto}
+.hlist .hi{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line2)}
+.hlist .hi:last-child{border-bottom:none}
+.hlist .hi .v{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums;padding:3px 10px;border-radius:6px}
+.hlist .hi .v.rep{background:var(--rep);color:var(--rep-t)}
+.hlist .hi .v.cln{background:var(--cln);color:var(--cln-t)}
+.hlist .hi .no{color:var(--sub);font-size:13px;width:26px}
+.hlist .hi .sp{flex:1}
+.hlist .hi.editing{background:#fff7e0}
+.hlist .empty{padding:14px;color:var(--sub);text-align:center}
+.editbar{background:#fff7e0;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:14px;font-weight:700;color:#92400e;display:flex;align-items:center;gap:8px}
+.note{font-size:13px;color:var(--sub);line-height:1.65}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fade .15s;max-width:90vw}
 .toast.err{background:#b91c1c}
 @media (max-width:640px){header{padding:10px 12px}.sync{margin-left:0;width:100%}.cats,main{padding-left:10px;padding-right:10px}.cat{flex:1;padding:9px 6px;font-size:13px}}
 </style>
@@ -142,26 +161,44 @@ table.mini input,table.mini select{width:100%}
 </nav>
 
 <main>
+  <!-- PM Part -->
   <section id="sec-pm">
     <div class="card">
       <div class="toolbar">
-        <button id="btnEq">🛠 설비 추가/제거</button>
-        <button id="btnParts">📋 부위/항목 관리</button>
-        <button id="btnOld">🕘 예전 이력 보기</button>
-        <span class="info" id="profileInfo"></span>
+        <button data-do="eq">🛠 설비 추가/제거</button>
+        <button data-do="parts">📋 부위/항목 관리</button>
+        <button data-do="old">🕘 예전 이력 보기</button>
+        <span class="info" data-info></span>
       </div>
-      <div id="eqGroups"></div>
+      <div class="eqgroups"></div>
     </div>
-    <div id="tableArea"></div>
+    <div class="tablearea"></div>
     <div class="legend">
+      <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
       <span><b style="background:var(--rep);border:1px solid #86efac"></b>교체 (YYMMDD)</span>
       <span><b style="background:var(--cln);border:1px solid #93c5fd"></b>CLN (YYMMDD CLN)</span>
-      <span>· 항목 클릭 = 오늘 날짜로 교체 추가</span>
-      <span>· 빈 칸 클릭 = 날짜/구분 선택 추가</span>
-      <span>· 기록된 칸 클릭 = 수정/삭제</span>
+      <span>· 입력 칸의 🖱 버튼을 눌러 이력 추가/수정/삭제</span>
     </div>
   </section>
-  <section id="sec-cryo" hidden><div class="card soon"><b>Cryo Pump</b>다음 단계에서 구성 예정입니다.</div></section>
+
+  <!-- Cryo Pump -->
+  <section id="sec-cryo" hidden>
+    <div class="card">
+      <div class="toolbar">
+        <button data-do="eq">🛠 설비 추가/제거</button>
+        <button data-do="pumps">🔧 Pump 추가/제거</button>
+        <button data-do="old">🕘 예전 이력 보기</button>
+        <span class="info" data-info></span>
+      </div>
+      <div class="eqgroups"></div>
+    </div>
+    <div class="tablearea"></div>
+    <div class="legend">
+      <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
+      <span>· 입력 칸의 🖱 버튼을 눌러 이력 추가/수정/삭제</span>
+    </div>
+  </section>
+
   <section id="sec-gas" hidden><div class="card soon"><b>Gas Bottle</b>다음 단계에서 구성 예정입니다.</div></section>
   <section id="sec-pending" hidden><div class="card soon"><b>Pending</b>다음 단계에서 구성 예정입니다.</div></section>
 </main>
@@ -179,7 +216,6 @@ const DEFAULT_CONFIG = {
   profile: 'default',                  // 명명법(프로필) → data/equipment_프로필.json, data/history_프로필.json
   pollSec: 10                          // 몇 초마다 다른 사람 변경사항 확인할지
 };
-const TEN = 10;   // 화면에 보이는 교체일자 칸 수
 
 /* =====================================================================
    공통 유틸
@@ -196,8 +232,10 @@ const pad = n => String(n).padStart(2, '0');
 const hhmmss = (d=new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 const todayYMD = () => { const d = new Date(); return `${pad(d.getFullYear()%100)}${pad(d.getMonth()+1)}${pad(d.getDate())}`; };
 const uid = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-const byName = (a,b) => a.name.localeCompare(b.name, 'ko', {numeric:true, sensitivity:'base'});
+const natural = (a,b) => String(a).localeCompare(String(b), 'ko', {numeric:true, sensitivity:'base'});
+const byName = (a,b) => natural(a.name, b.name);
 const partKey = p => `${p.area}|${p.item}`;
+const CLICK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10l9.5 3.6-4.1 1.6-1.6 4.1z" fill="currentColor"/><path d="M15.4 15.2l3.6 3.6"/><path d="M7.5 2.8v2.6M2.8 7.5h2.6M4.2 4.2l1.8 1.8M10.8 4.2L9 6"/></svg>`;
 
 /* 날짜 입력 → YYMMDD (YYMMDD, YY.MM.DD, YY-MM-DD, YY/MM/DD, YYYYMMDD, YYYY-MM-DD 모두 허용) */
 function normDate(s){
@@ -221,6 +259,7 @@ function normDate(s){
 const ymdToIso = v => `20${v.slice(0,2)}-${v.slice(2,4)}-${v.slice(4,6)}`;
 const isoToYmd = v => v ? v.slice(2,4)+v.slice(5,7)+v.slice(8,10) : '';
 const entryText = e => e.t === 'CLN' ? `${e.d} CLN` : e.d;
+const sameEntry = (a, b) => a.d === b.d && (a.t || '') === (b.t || '');
 const sortEntries = arr => arr.sort((a,b) => b.d.localeCompare(a.d));   // 최신이 왼쪽
 
 /* UTF-8 ↔ Base64 (한글 깨짐 방지) */
@@ -254,8 +293,8 @@ const FILES = {
   hist: () => `data/history_${cfg.profile}.json`
 };
 const EMPTY = {
-  eq:   () => ({ profile: cfg.profile, prcList: ['HC_C','LE','HE','HVMS'], equipment: [], parts: {}, updatedAt: null, updatedBy: '' }),
-  hist: () => ({ version: 1, pm: {}, updatedAt: null, updatedBy: '' })
+  eq:   () => ({ profile: cfg.profile, prcList: ['HC_C','LE','HE','HVMS'], equipment: [], parts: {}, pumps: {}, updatedAt: null, updatedBy: '' }),
+  hist: () => ({ version: 1, pm: {}, cryo: {}, updatedAt: null, updatedBy: '' })
 };
 
 /* =====================================================================
@@ -346,15 +385,19 @@ async function reload(key){
   normalize(key, s.remote);
   return old !== s.sha;
 }
+/* 예전 json에 새 항목(pumps, cryo 등)이 없어도 자동으로 채워줌 */
 function normalize(key, d){
   if(key === 'eq'){
     d.prcList = Array.isArray(d.prcList) ? d.prcList : [];
     d.equipment = Array.isArray(d.equipment) ? d.equipment : [];
     d.parts = d.parts && typeof d.parts === 'object' ? d.parts : {};
+    d.pumps = d.pumps && typeof d.pumps === 'object' ? d.pumps : {};
     for(const p of d.prcList) if(!Array.isArray(d.parts[p])) d.parts[p] = [];
     for(const k in d.parts) for(const pt of d.parts[k]) if(!pt.id) pt.id = uid('p');
+    for(const k in d.pumps) if(!Array.isArray(d.pumps[k])) d.pumps[k] = [];
   }else{
     d.pm = d.pm && typeof d.pm === 'object' ? d.pm : {};
+    d.cryo = d.cryo && typeof d.cryo === 'object' ? d.cryo : {};
   }
 }
 
@@ -449,29 +492,48 @@ function markChanged(word, by){
 }
 
 /* =====================================================================
-   화면 상태
+   카테고리 정의 (PM Part / Cryo Pump) — 표 구조만 다르고 동작은 같음
    ===================================================================== */
-const ui = {
-  cat: lsGet('cat', 'pm'),
-  sel: lsGet('sel', null)      // {type:'eq', name} 또는 {type:'prc', prc}
-};
 const EQ = () => store.eq.view;
 const HIST = () => store.hist.view;
-function eqOfPrc(prc){ return EQ().equipment.filter(e => e.prc === prc).sort(byName); }
 function allPrcs(){
   const list = [...EQ().prcList];
   for(const e of EQ().equipment) if(!list.includes(e.prc)) list.push(e.prc);
   return list;
 }
-function getEntries(eqName, pk){ return (HIST().pm[eqName] && HIST().pm[eqName][pk]) || []; }
+const MODS = {
+  pm: {
+    hk: 'pm', cols: 10, hasType: true,
+    heads: ['설비명', '부위', '항목'],
+    prcs: () => allPrcs(),
+    rows: eq => (EQ().parts[eq.prc] || []).map(p => ({ key: partKey(p), area: p.area, name: p.item, title: `${p.area} · ${p.item}` })),
+    emptyRows: prc => `${prc}에 등록된 부위/항목이 없습니다 → 📋 부위/항목 관리에서 추가`
+  },
+  cryo: {
+    hk: 'cryo', cols: 8, hasType: false,
+    heads: ['설비 호기', 'Pump 명'],
+    prcs: () => allPrcs().filter(p => Array.isArray(EQ().pumps[p])),
+    rows: eq => (EQ().pumps[eq.prc] || []).map(n => ({ key: n, name: n, title: n })),
+    emptyRows: prc => `${prc}에 등록된 Pump가 없습니다 → 🔧 Pump 추가/제거에서 추가`
+  }
+};
+function eqOfPrc(prc){ return EQ().equipment.filter(e => e.prc === prc).sort(byName); }
+function getEntries(hk, eqName, key){ const h = HIST()[hk] || {}; return (h[eqName] && h[eqName][key]) || []; }
 
-function selectedEquipment(){
-  const eqs = EQ().equipment;
-  let sel = ui.sel;
+/* =====================================================================
+   화면 상태
+   ===================================================================== */
+const ui = {
+  cat: lsGet('cat', 'pm'),
+  sel: lsGet('sel2', {})       // { pm: {type:'eq',name} | {type:'prc',prc}, cryo: ... }
+};
+function selectedEquipment(cat){
+  const mod = MODS[cat], prcs = mod.prcs();
+  const eqs = EQ().equipment.filter(e => prcs.includes(e.prc));
+  const sel = ui.sel[cat];
   if(sel && sel.type === 'eq' && eqs.some(e => e.name === sel.name)) return eqs.filter(e => e.name === sel.name);
-  if(sel && sel.type === 'prc' && allPrcs().includes(sel.prc)) return eqOfPrc(sel.prc);
-  // 기본: 첫 번째 설비
-  for(const p of allPrcs()){ const l = eqOfPrc(p); if(l.length){ ui.sel = { type: 'eq', name: l[0].name }; return [l[0]]; } }
+  if(sel && sel.type === 'prc' && prcs.includes(sel.prc)) return eqOfPrc(sel.prc);
+  for(const p of prcs){ const l = eqOfPrc(p); if(l.length){ ui.sel[cat] = { type: 'eq', name: l[0].name }; return [l[0]]; } }
   return [];
 }
 
@@ -482,57 +544,61 @@ function render(){
   if(!EQ() || !HIST()) return;
   document.querySelectorAll('.cat').forEach(b => b.classList.toggle('on', b.dataset.cat === ui.cat));
   ['pm','cryo','gas','pending'].forEach(c => $('#sec-' + c).hidden = c !== ui.cat);
-  $('#profileInfo').textContent = `명명법: ${cfg.profile}  ·  ${FILES.eq()}`;
-  renderEqGroups();
-  const list = selectedEquipment();
-  $('#tableArea').innerHTML = list.length
-    ? `<div class="tblwrap">${buildTable(list, TEN)}</div>`
-    : `<div class="card empty-state">등록된 설비가 없습니다.<br>위의 <b>🛠 설비 추가/제거</b> 버튼으로 설비를 추가하세요.</div>`;
-  const full = document.getElementById('fullHist');
-  if(full) renderFullHist(full);
+  for(const cat of Object.keys(MODS)){
+    const sec = $('#sec-' + cat);
+    sec.querySelector('[data-info]').textContent = `명명법: ${cfg.profile}  ·  ${FILES.eq()}`;
+    renderEqGroups(cat, sec.querySelector('.eqgroups'));
+    const list = selectedEquipment(cat);
+    sec.querySelector('.tablearea').innerHTML = list.length
+      ? `<div class="tblwrap">${buildTable(cat, list, MODS[cat].cols, false)}</div>`
+      : `<div class="card empty-state">${cat === 'cryo' && !MODS.cryo.prcs().length
+          ? 'Pump가 등록된 PRC가 없습니다.<br><b>🔧 Pump 추가/제거</b> 버튼으로 Pump를 추가하세요.'
+          : '등록된 설비가 없습니다.<br><b>🛠 설비 추가/제거</b> 버튼으로 설비를 추가하세요.'}</div>`;
+  }
+  document.querySelectorAll('[data-fullhist]').forEach(el => renderFullHist(el.dataset.fullhist, el));
 }
 
-function renderEqGroups(){
-  const sel = ui.sel || {};
+function renderEqGroups(cat, box){
+  const sel = ui.sel[cat] || {};
   let html = '';
-  for(const prc of allPrcs()){
+  for(const prc of MODS[cat].prcs()){
     const list = eqOfPrc(prc);
     html += `<div class="prcgrp">
-      <button class="prclabel ${sel.type==='prc' && sel.prc===prc ? 'on' : ''}" data-prc="${esc(prc)}" title="${esc(prc)} 전체 보기">${esc(prc)}</button>
-      ${list.map(e => `<button class="eqbtn ${sel.type==='eq' && sel.name===e.name ? 'on' : ''}" data-eq="${esc(e.name)}">${esc(e.name)}</button>`).join('')}
+      <button class="prclabel ${sel.type==='prc' && sel.prc===prc ? 'on' : ''}" data-cat="${cat}" data-prc="${esc(prc)}" title="${esc(prc)} 전체 보기">${esc(prc)}</button>
+      ${list.map(e => `<button class="eqbtn ${sel.type==='eq' && sel.name===e.name ? 'on' : ''}" data-cat="${cat}" data-eq="${esc(e.name)}">${esc(e.name)}</button>`).join('')}
       ${list.length ? '' : '<span class="note">설비 없음</span>'}
     </div>`;
   }
-  $('#eqGroups').innerHTML = html || '<div class="note">PRC가 없습니다. 설비 추가/제거에서 PRC를 추가하세요.</div>';
+  box.innerHTML = html || '<div class="note">표시할 PRC가 없습니다.</div>';
 }
 
-function buildTable(eqList, cols){
-  let h = `<table class="ph"><thead>
-    <tr><th rowspan="2">설비명</th><th rowspan="2">부위</th><th rowspan="2">항목</th><th colspan="${cols}">교체 일자 (최신 ←)</th></tr>
-    <tr>${Array.from({length: cols}, (_, i) => `<th>${i+1}</th>`).join('')}</tr>
+function buildTable(cat, eqList, cols, fixed){
+  const mod = MODS[cat];
+  const nFix = mod.heads.length + 1;   // + 입력 칸
+  let h = `<table class="ph ${fixed ? 'fixed' : ''}"><thead>
+    <tr>${mod.heads.map(t => `<th rowspan="2">${t}</th>`).join('')}<th rowspan="2">입력</th><th colspan="${cols}">교체 일자 (최신 ←)</th></tr>
+    <tr>${Array.from({length: cols}, (_, i) => `<th class="dh ${i===0 ? 'latest-h' : ''}">${i===0 ? '1 (최신)' : i+1}</th>`).join('')}</tr>
   </thead><tbody>`;
   for(const eq of eqList){
-    const parts = EQ().parts[eq.prc] || [];
-    if(!parts.length){
-      h += `<tr class="eqstart"><td class="eqn">${esc(eq.name)}</td><td colspan="${cols+2}" class="noparts">${esc(eq.prc)}에 등록된 부위/항목이 없습니다 → 📋 부위/항목 관리에서 추가</td></tr>`;
+    const rows = mod.rows(eq);
+    if(!rows.length){
+      h += `<tr class="eqstart"><td class="eqn">${esc(eq.name)}</td><td colspan="${cols + nFix - 1}" class="noparts">${esc(mod.emptyRows(eq.prc))}</td></tr>`;
       continue;
     }
-    parts.forEach((p, pi) => {
-      const pk = partKey(p);
-      const ents = getEntries(eq.name, pk);
-      h += `<tr class="${pi===0 ? 'eqstart' : ''}">`;
-      if(pi === 0) h += `<td class="eqn" rowspan="${parts.length}">${esc(eq.name)}</td>`;
-      if(pi === 0 || parts[pi-1].area !== p.area){
-        let span = 1; while(pi+span < parts.length && parts[pi+span].area === p.area) span++;
-        h += `<td class="area" rowspan="${span}">${esc(p.area)}</td>`;
+    rows.forEach((r, ri) => {
+      const ents = getEntries(mod.hk, eq.name, r.key);
+      h += `<tr class="${ri===0 ? 'eqstart' : ''}">`;
+      if(ri === 0) h += `<td class="eqn" rowspan="${rows.length}">${esc(eq.name)}</td>`;
+      if(cat === 'pm' && (ri === 0 || rows[ri-1].area !== r.area)){
+        let span = 1; while(ri+span < rows.length && rows[ri+span].area === r.area) span++;
+        h += `<td class="area" rowspan="${span}">${esc(r.area)}</td>`;
       }
-      const more = ents.length > TEN && cols === TEN ? `<span class="more" title="화면에 안 보이는 예전 이력">+${ents.length - TEN}</span>` : '';
-      const attrs = `data-eq="${esc(eq.name)}" data-pid="${esc(p.id)}"`;
-      h += `<td class="item" data-act="today" ${attrs}>${esc(p.item)}${more}</td>`;
+      h += `<td class="item">${esc(r.name)}</td>`;
+      h += `<td class="in"><button class="inbtn" title="이력 입력" data-cat="${cat}" data-eq="${esc(eq.name)}" data-key="${esc(r.key)}">${CLICK_ICON}</button></td>`;
       for(let i = 0; i < cols; i++){
         const e = ents[i];
-        if(e) h += `<td class="d ${e.t==='CLN' ? 'cln' : 'rep'} ${i===0 ? 'latest' : ''}" data-act="edit" data-i="${i}" ${attrs}>${esc(entryText(e))}</td>`;
-        else  h += `<td class="d empty" data-act="add" ${attrs}></td>`;
+        if(e) h += `<td class="d ${e.t==='CLN' ? 'cln' : 'rep'} ${i===0 ? 'latest' : ''}">${esc(entryText(e))}</td>`;
+        else  h += `<td class="d"></td>`;
       }
       h += `</tr>`;
     });
@@ -540,11 +606,13 @@ function buildTable(eqList, cols){
   return h + `</tbody></table>`;
 }
 
-function renderFullHist(el){
-  const list = selectedEquipment();
-  let max = TEN;
-  for(const eq of list) for(const p of (EQ().parts[eq.prc] || [])) max = Math.max(max, getEntries(eq.name, partKey(p)).length + 1);
-  el.innerHTML = list.length ? `<div class="tblwrap">${buildTable(list, max)}</div>` : '<div class="empty-state">설비가 없습니다.</div>';
+function renderFullHist(cat, el){
+  const list = selectedEquipment(cat), mod = MODS[cat];
+  let max = mod.cols;
+  for(const eq of list) for(const r of mod.rows(eq)) max = Math.max(max, getEntries(mod.hk, eq.name, r.key).length);
+  const sl = el.querySelector('.tblwrap') ? el.querySelector('.tblwrap').scrollLeft : 0;
+  el.innerHTML = list.length ? `<div class="tblwrap">${buildTable(cat, list, max, true)}</div>` : '<div class="empty-state">설비가 없습니다.</div>';
+  const w = el.querySelector('.tblwrap'); if(w) w.scrollLeft = sl;
 }
 
 /* =====================================================================
@@ -554,140 +622,201 @@ $('#cats').addEventListener('click', e => {
   const b = e.target.closest('.cat'); if(!b) return;
   ui.cat = b.dataset.cat; lsSet('cat', ui.cat); render();
 });
-$('#eqGroups').addEventListener('click', e => {
-  const eb = e.target.closest('[data-eq]'), pb = e.target.closest('[data-prc]');
-  if(eb) ui.sel = { type: 'eq', name: eb.dataset.eq };
-  else if(pb) ui.sel = { type: 'prc', prc: pb.dataset.prc };
-  else return;
-  lsSet('sel', ui.sel); render();
-});
 document.addEventListener('click', e => {
-  const td = e.target.closest('table.ph td[data-act]'); if(!td) return;
-  const eqName = td.dataset.eq;
-  const eq = EQ().equipment.find(x => x.name === eqName); if(!eq) return;
-  const part = (EQ().parts[eq.prc] || []).find(p => p.id === td.dataset.pid); if(!part) return;
-  if(td.dataset.act === 'today') addToday(eqName, part);
-  else if(td.dataset.act === 'add') openEntryModal(eqName, part, null);
-  else if(td.dataset.act === 'edit') openEntryModal(eqName, part, +td.dataset.i);
+  const eb = e.target.closest('.eqgroups [data-eq]'), pb = e.target.closest('.eqgroups [data-prc]');
+  if(eb || pb){
+    const b = eb || pb;
+    ui.sel[b.dataset.cat] = eb ? { type: 'eq', name: eb.dataset.eq } : { type: 'prc', prc: pb.dataset.prc };
+    lsSet('sel2', ui.sel); render(); return;
+  }
+  const ib = e.target.closest('.inbtn');
+  if(ib){ openEntryModal(ib.dataset.cat, ib.dataset.eq, ib.dataset.key); return; }
+  const tb = e.target.closest('.toolbar [data-do]');
+  if(tb){
+    const cat = tb.closest('section').id.replace('sec-', '');
+    ({ eq: openEqModal, parts: openPartsModal, pumps: openPumpModal, old: () => openOldModal(cat) })[tb.dataset.do]();
+  }
 });
-$('#btnEq').onclick = openEqModal;
-$('#btnParts').onclick = openPartsModal;
-$('#btnOld').onclick = openOldModal;
 $('#btnSettings').onclick = openSettings;
 $('#sync').onclick = openSettings;
 
 /* =====================================================================
-   이력 작업 (추가/수정/삭제)
+   이력 입력 팝업 (추가 / 수정 / 삭제) — 🖱 버튼 하나로만 열림
    ===================================================================== */
-function opAddEntry(eqName, pk, entry){
+function opAddEntry(hk, eqName, key, entry){
   return d => {
-    d.pm[eqName] = d.pm[eqName] || {};
-    const arr = d.pm[eqName][pk] = d.pm[eqName][pk] || [];
-    if(arr.some(x => x.d === entry.d && x.t === entry.t)) return;   // 중복 방지
-    arr.push({ d: entry.d, t: entry.t });
+    d[hk] = d[hk] || {};
+    d[hk][eqName] = d[hk][eqName] || {};
+    const arr = d[hk][eqName][key] = d[hk][eqName][key] || [];
+    if(arr.some(x => sameEntry(x, entry))) return;   // 중복 방지
+    arr.push(clone(entry));
     sortEntries(arr);
   };
 }
-function addToday(eqName, part){
-  const pk = partKey(part), d = todayYMD();
-  if(getEntries(eqName, pk).some(x => x.d === d && x.t === '교체')){ toast(`이미 오늘(${d}) 교체 기록이 있습니다`); return; }
-  commit('hist', opAddEntry(eqName, pk, { d, t: '교체' }), `${eqName} ${part.item} ${d} 교체`);
-  toast(`${eqName} · ${part.item} — ${d} 교체 추가`);
-}
+function mkEntry(mod, d, t){ return mod.hasType ? { d, t } : { d }; }
 
-function openEntryModal(eqName, part, idx){
-  const pk = partKey(part);
-  const old = idx != null ? getEntries(eqName, pk)[idx] : null;
-  let type = old ? old.t : '교체';
-  const d0 = old ? old.d : todayYMD();
+function openEntryModal(cat, eqName, key){
+  const mod = MODS[cat], hk = mod.hk;
+  const eq = EQ().equipment.find(x => x.name === eqName); if(!eq) return;
+  const row = mod.rows(eq).find(r => r.key === key); if(!row) return;
+  let type = '교체';
+  let editing = null;   // 수정 중인 기록
   const m = openModal({
-    title: old ? '이력 수정 / 삭제' : '이력 추가',
+    title: '이력 입력',
     body: `
-      <div class="target">${esc(eqName)} · ${esc(part.area)} · ${esc(part.item)}</div>
+      <div class="target">${esc(eqName)} · ${esc(row.title)}</div>
+      <div id="enEditBar"></div>
       <div class="fld"><label>날짜 (달력 선택 또는 직접 입력)</label>
         <div class="row">
-          <input type="date" id="enDate" value="${ymdToIso(d0)}">
-          <input id="enText" value="${d0}" placeholder="YYMMDD 또는 YY.MM.DD" maxlength="10" inputmode="numeric" autocomplete="off">
+          <input type="date" id="enDate">
+          <input id="enText" placeholder="YYMMDD 또는 YY.MM.DD" maxlength="10" inputmode="numeric" autocomplete="off">
         </div>
         <div class="hint" id="enHint"></div>
       </div>
-      <div class="fld"><label>구분</label>
+      ${mod.hasType ? `<div class="fld"><label>구분</label>
         <div class="seg"><button data-t="교체">교체</button><button data-t="CLN">CLN</button></div>
-      </div>`,
-    buttons: old ? [
-      { text: '🗑 삭제', cls: 'danger left', onClick: async () => {
-          if(!await confirmBox(`<b>${esc(eqName)} · ${esc(part.item)}</b><br>「${esc(entryText(old))}」 이력을 정말로 삭제할까요?`)) return false;
-          commit('hist', d => {
-            const arr = d.pm[eqName] && d.pm[eqName][pk]; if(!arr) return;
-            const i = arr.findIndex(x => x.d === old.d && x.t === old.t); if(i >= 0) arr.splice(i, 1);
-          }, `${eqName} ${part.item} ${entryText(old)} 삭제`);
-          toast('삭제했습니다');
-        } },
-      { text: '취소' },
-      { text: '저장', cls: 'pri', onClick: () => save() }
-    ] : [
-      { text: '취소' },
-      { text: '추가', cls: 'pri', onClick: () => save() }
-    ]
+      </div>` : ''}
+      <div class="row" style="justify-content:flex-end;margin-bottom:18px"><button class="pri" id="enSave" style="min-width:140px">추가</button></div>
+      <div class="sec" style="margin-bottom:0"><h4 id="enCount">기록된 이력</h4><div class="hlist" id="enList"></div></div>`,
+    buttons: [{ text: '닫기' }]
   });
-  const dateEl = m.el.querySelector('#enDate'), txtEl = m.el.querySelector('#enText'), hint = m.el.querySelector('#enHint');
-  const segBtns = m.el.querySelectorAll('.seg button');
+  const el = m.el;
+  const dateEl = el.querySelector('#enDate'), txtEl = el.querySelector('#enText'), hint = el.querySelector('#enHint');
+  const segBtns = el.querySelectorAll('.seg button');
   const paintSeg = () => segBtns.forEach(b => b.classList.toggle('on', b.dataset.t === type));
-  segBtns.forEach(b => b.onclick = () => { type = b.dataset.t; paintSeg(); });
-  paintSeg();
-  const showHint = () => {
+  segBtns.forEach(b => b.onclick = () => { type = b.dataset.t; paintSeg(); showHint(); });
+
+  function setForm(d, t){
+    txtEl.value = d; dateEl.value = ymdToIso(d); type = t || '교체'; paintSeg(); showHint();
+  }
+  function showHint(){
     const v = normDate(txtEl.value);
     if(!txtEl.value.trim()){ hint.className = 'hint'; hint.textContent = ''; return null; }
-    if(v){ hint.className = 'hint okk'; hint.textContent = `→ 표에는 「${type === 'CLN' ? v + ' CLN' : v}」 로 기록`; dateEl.value = ymdToIso(v); }
+    if(v){ hint.className = 'hint okk'; hint.textContent = `→ 표에는 「${entryText(mkEntry(mod, v, type))}」 로 기록`; dateEl.value = ymdToIso(v); }
     else { hint.className = 'hint err'; hint.textContent = '날짜 형식이 올바르지 않습니다 (예: 260910 / 26.09.10)'; }
     return v;
-  };
+  }
+  function drawList(){
+    const ents = getEntries(hk, eqName, key);
+    el.querySelector('#enCount').textContent = `기록된 이력 (${ents.length}건 · 최신순)`;
+    el.querySelector('#enList').innerHTML = ents.length ? ents.map((x, i) => `
+      <div class="hi ${editing && sameEntry(editing, x) ? 'editing' : ''}" data-i="${i}">
+        <span class="no">${i+1}</span>
+        <span class="v ${x.t==='CLN' ? 'cln' : 'rep'}">${esc(entryText(x))}</span>
+        <span class="sp"></span>
+        <button class="sm" data-a="edit">수정</button>
+        <button class="sm danger" data-a="del">삭제</button>
+      </div>`).join('') : '<div class="empty">아직 기록이 없습니다.</div>';
+  }
+  function setEditing(x){
+    editing = x;
+    el.querySelector('#enEditBar').innerHTML = x ? `<div class="editbar">✏ 「${esc(entryText(x))}」 수정 중 <span style="flex:1"></span><button class="sm" id="enCancelEdit">수정 취소</button></div>` : '';
+    el.querySelector('#enSave').textContent = x ? '수정 저장' : '추가';
+    if(x){ setForm(x.d, x.t); el.querySelector('#enCancelEdit').onclick = () => { setEditing(null); setForm(todayYMD(), '교체'); }; }
+    drawList();
+  }
+
   dateEl.onchange = () => { txtEl.value = isoToYmd(dateEl.value); showHint(); };
   txtEl.oninput = showHint;
-  segBtns.forEach(b => b.addEventListener('click', showHint));
-  m.el.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); if(save() !== false) m.close(); } });
-  setTimeout(() => { txtEl.focus(); txtEl.select(); }, 30);
-  showHint();
+  txtEl.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); save(); } });
+  el.querySelector('#enSave').onclick = save;
+  el.querySelector('#enList').addEventListener('click', async e => {
+    const b = e.target.closest('button[data-a]'); if(!b) return;
+    const x = getEntries(hk, eqName, key)[+b.closest('.hi').dataset.i]; if(!x) return;
+    if(b.dataset.a === 'edit'){ setEditing(clone(x)); txtEl.focus(); return; }
+    if(!await confirmBox(`<b>${esc(eqName)} · ${esc(row.name)}</b><br>「${esc(entryText(x))}」 이력을 정말로 삭제할까요?`)) return;
+    commit('hist', d => {
+      const arr = d[hk] && d[hk][eqName] && d[hk][eqName][key]; if(!arr) return;
+      const i = arr.findIndex(y => sameEntry(y, x)); if(i >= 0) arr.splice(i, 1);
+    }, `${eqName} ${row.name} ${entryText(x)} 삭제`);
+    if(editing && sameEntry(editing, x)){ setEditing(null); setForm(todayYMD(), '교체'); }
+    toast('삭제했습니다'); drawList();
+  });
 
   function save(){
     const v = normDate(txtEl.value);
-    if(!v){ hint.className = 'hint err'; hint.textContent = '날짜를 확인해 주세요 (예: 260910 / 26.09.10)'; return false; }
-    const ents = getEntries(eqName, pk);
-    const dup = ents.some(x => x.d === v && x.t === type && !(old && x.d === old.d && x.t === old.t));
-    if(dup){ hint.className = 'hint err'; hint.textContent = '같은 날짜·구분의 기록이 이미 있습니다'; return false; }
-    const ne = { d: v, t: type };
-    if(old){
-      if(old.d === v && old.t === type) return;
-      commit('hist', d => {
-        const arr = d.pm[eqName] && d.pm[eqName][pk]; if(!arr) return;
-        const i = arr.findIndex(x => x.d === old.d && x.t === old.t);
-        if(i >= 0) arr[i] = ne; else arr.push(ne);
-        sortEntries(arr);
-      }, `${eqName} ${part.item} ${entryText(old)} → ${entryText(ne)}`);
-      toast(`수정: ${entryText(ne)}`);
+    if(!v){ hint.className = 'hint err'; hint.textContent = '날짜를 확인해 주세요 (예: 260910 / 26.09.10)'; return; }
+    const ne = mkEntry(mod, v, type);
+    const ents = getEntries(hk, eqName, key);
+    if(ents.some(x => sameEntry(x, ne) && !(editing && sameEntry(x, editing)))){ hint.className = 'hint err'; hint.textContent = '같은 날짜·구분의 기록이 이미 있습니다'; return; }
+    if(editing){
+      const old = editing;
+      if(!sameEntry(old, ne)){
+        commit('hist', d => {
+          d[hk] = d[hk] || {}; d[hk][eqName] = d[hk][eqName] || {};
+          const arr = d[hk][eqName][key] = d[hk][eqName][key] || [];
+          const i = arr.findIndex(y => sameEntry(y, old));
+          if(i >= 0) arr[i] = clone(ne); else arr.push(clone(ne));
+          sortEntries(arr);
+        }, `${eqName} ${row.name} ${entryText(old)} → ${entryText(ne)}`);
+        toast(`수정: ${entryText(old)} → ${entryText(ne)}`);
+      }
+      setEditing(null); setForm(todayYMD(), '교체');
     }else{
-      commit('hist', opAddEntry(eqName, pk, ne), `${eqName} ${part.item} ${entryText(ne)} 추가`);
-      toast(`${eqName} · ${part.item} — ${entryText(ne)} 추가`);
+      commit('hist', opAddEntry(hk, eqName, key, ne), `${eqName} ${row.name} ${entryText(ne)} 추가`);
+      toast(`${eqName} · ${row.name} — ${entryText(ne)} 추가`);
+      m.close();
     }
   }
+
+  setForm(todayYMD(), '교체');
+  drawList();
+  setTimeout(() => { txtEl.focus(); txtEl.select(); }, 30);
 }
 
 /* =====================================================================
-   예전 이력 보기 (전체 표)
+   예전 이력 보기 (전체 표) — 기본 10칸(Cryo 8칸) 폭, 넘치면 좌우 스크롤
    ===================================================================== */
-function openOldModal(){
-  const list = selectedEquipment();
-  const title = ui.sel && ui.sel.type === 'prc' ? `${ui.sel.prc} 전체` : (list[0] ? list[0].name : '');
+function openOldModal(cat){
+  const mod = MODS[cat];
+  const list = selectedEquipment(cat);
+  const sel = ui.sel[cat];
+  const title = sel && sel.type === 'prc' ? `${sel.prc} 전체` : (list[0] ? list[0].name : '');
+  const fixedW = cat === 'pm' ? 430 : 300;           // 설비명·부위·항목·입력 칸 대략 폭
+  const width = Math.min(window.innerWidth * 0.96, fixedW + mod.cols * 113 + 50);
   const m = openModal({
-    title: `🕘 전체 이력 — ${esc(title)}`, wide: 'xwide',
-    body: `<div class="note" style="margin-bottom:8px">저장된 모든 이력을 보여줍니다. 여기서도 칸을 눌러 추가/수정/삭제할 수 있습니다.</div><div id="fullHist"></div>`,
+    title: `🕘 전체 이력 — ${esc(title)}`,
+    body: `<div class="note" style="margin-bottom:8px">저장된 모든 이력입니다. 오른쪽으로 스크롤하면 더 오래된 이력이 보입니다.</div><div data-fullhist="${cat}"></div>`,
     buttons: [{ text: '닫기', cls: 'pri' }]
   });
-  renderFullHist(m.el.querySelector('#fullHist'));
+  m.el.querySelector('.modal').style.maxWidth = width + 'px';
+  renderFullHist(cat, m.el.querySelector('[data-fullhist]'));
 }
 
 /* =====================================================================
-   설비 추가/제거
+   드래그 앤 드롭 (목록 순서 변경) — ⠿ 손잡이를 잡고 끌기
+   ===================================================================== */
+function makeSortable(tbody, onDrop){
+  let dragEl = null;
+  tbody.addEventListener('mousedown', e => { const h = e.target.closest('.drag'); if(h) h.closest('tr').draggable = true; });
+  document.addEventListener('mouseup', () => { if(!dragEl) tbody.querySelectorAll('tr[draggable=true]').forEach(t => t.draggable = false); });
+  tbody.addEventListener('dragstart', e => {
+    dragEl = e.target.closest('tr[data-id]'); if(!dragEl) return;
+    dragEl.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try{ e.dataTransfer.setData('text/plain', dragEl.dataset.id); }catch(_){}
+  });
+  tbody.addEventListener('dragover', e => {
+    if(!dragEl) return;
+    e.preventDefault();
+    const tr = e.target.closest('tr[data-id]'); if(!tr || tr === dragEl) return;
+    const r = tr.getBoundingClientRect();
+    tr.parentNode.insertBefore(dragEl, e.clientY > r.top + r.height / 2 ? tr.nextSibling : tr);
+  });
+  tbody.addEventListener('drop', e => e.preventDefault());
+  tbody.addEventListener('dragend', () => {
+    if(!dragEl) return;
+    dragEl.classList.remove('dragging'); dragEl.draggable = false; dragEl = null;
+    onDrop([...tbody.querySelectorAll('tr[data-id]')].map(t => t.dataset.id));
+  });
+}
+function reorderBy(arr, ids, idOf){
+  const pos = new Map(ids.map((id, i) => [id, i]));
+  return [...arr].sort((a, b) => (pos.has(idOf(a)) ? pos.get(idOf(a)) : 1e9) - (pos.has(idOf(b)) ? pos.get(idOf(b)) : 1e9));
+}
+
+/* =====================================================================
+   설비 추가/제거 (PM Part · Cryo Pump 공용)
    ===================================================================== */
 function openEqModal(){
   const m = openModal({
@@ -698,37 +827,41 @@ function openEqModal(){
         <div class="hint" id="eqHint"></div>
       </div>
       <div class="sec"><h4 id="eqCount">등록된 설비</h4><div id="eqList"></div></div>
-      <div class="sec"><h4>PRC 종류</h4>
-        <div class="chips" id="prcChips"></div>
-        <div class="row"><input id="newPrc" placeholder="새 PRC 이름" autocomplete="off"><button id="addPrc">PRC 추가</button></div>
-      </div>
-      <div class="note">· 설비명을 바꾸면 기존 이력도 새 이름으로 옮겨집니다.<br>· 설비를 삭제해도 이력은 history 파일에 남아 있어서, 같은 이름으로 다시 추가하면 이력이 다시 보입니다.</div>`,
+      <div class="note">· 설비명을 바꾸면 기존 이력(PM Part·Cryo Pump)도 새 이름으로 옮겨집니다.<br>· 설비를 삭제해도 이력은 history 파일에 남아 있어서, 같은 이름으로 다시 추가하면 이력이 다시 보입니다.</div>`,
     buttons: [{ text: '닫기', cls: 'pri' }]
   });
   const el = m.el;
   const hint = el.querySelector('#eqHint');
   const prcOptions = sel => allPrcs().map(p => `<option ${p === sel ? 'selected' : ''}>${esc(p)}</option>`).join('');
   const exists = (name, except) => EQ().equipment.some(e => e.name.toLowerCase() === name.toLowerCase() && e.name !== except);
+  const curSel = ui.sel[ui.cat];
+  let lastPrc = curSel && curSel.type === 'prc' ? curSel.prc
+              : ((EQ().equipment.find(e => curSel && e.name === curSel.name) || {}).prc || allPrcs()[0]);
 
   function draw(){
-    el.querySelector('#newEqPrc').innerHTML = prcOptions(ui.sel && ui.sel.type === 'prc' ? ui.sel.prc : allPrcs()[0]);
-    const list = [...EQ().equipment].sort((a,b) => allPrcs().indexOf(a.prc) - allPrcs().indexOf(b.prc) || byName(a,b));
-    el.querySelector('#eqCount').textContent = `등록된 설비 (${list.length})`;
-    el.querySelector('#eqList').innerHTML = list.length ? `<table class="mini"><tr><th style="width:45%">설비명</th><th style="width:25%">PRC</th><th></th></tr>
-      ${list.map(e => `<tr data-name="${esc(e.name)}"><td><input class="en" value="${esc(e.name)}"></td><td><select class="ep">${prcOptions(e.prc)}</select></td>
-        <td style="white-space:nowrap;text-align:right"><button class="sm es">저장</button> <button class="sm danger ed">삭제</button></td></tr>`).join('')}</table>`
-      : '<div class="note">아직 설비가 없습니다.</div>';
-    el.querySelector('#prcChips').innerHTML = EQ().prcList.map(p => `<span class="chip">${esc(p)}<button data-delprc="${esc(p)}" title="삭제">×</button></span>`).join('') || '<span class="note">없음</span>';
+    el.querySelector('#newEqPrc').innerHTML = prcOptions(lastPrc);
+    el.querySelector('#eqCount').textContent = `등록된 설비 (${EQ().equipment.length}) — PRC별`;
+    let h = '';
+    for(const prc of allPrcs()){
+      const list = eqOfPrc(prc);
+      h += `<tr class="grp"><td colspan="3">${esc(prc)} <span class="note">(${list.length}대)</span></td></tr>`;
+      h += list.map(e => `<tr data-name="${esc(e.name)}"><td style="width:48%"><input class="en" value="${esc(e.name)}"></td><td style="width:24%"><select class="ep">${prcOptions(e.prc)}</select></td>
+        <td style="white-space:nowrap;text-align:right"><button class="sm es">저장</button> <button class="sm danger ed">삭제</button></td></tr>`).join('')
+        || `<tr><td colspan="3" class="note">설비 없음</td></tr>`;
+    }
+    el.querySelector('#eqList').innerHTML = `<table class="mini">${h}</table>`;
   }
   draw();
+  el.querySelector('#newEqPrc').onchange = e => { lastPrc = e.target.value; };
 
   el.querySelector('#addEq').onclick = () => {
     const name = el.querySelector('#newEqName').value.trim(), prc = el.querySelector('#newEqPrc').value;
     if(!name){ hint.className = 'hint err'; hint.textContent = '설비명을 입력하세요'; return; }
-    if(!prc){ hint.className = 'hint err'; hint.textContent = '먼저 PRC를 추가하세요'; return; }
+    if(!prc){ hint.className = 'hint err'; hint.textContent = 'PRC가 없습니다 (equipment json의 prcList 확인)'; return; }
     if(exists(name)){ hint.className = 'hint err'; hint.textContent = '이미 있는 설비명입니다'; return; }
     commit('eq', d => { if(!d.equipment.some(e => e.name === name)) d.equipment.push({ name, prc }); }, `설비 추가 ${name}(${prc})`);
     hint.className = 'hint okk'; hint.textContent = `${name} (${prc}) 추가됨`;
+    lastPrc = prc;
     el.querySelector('#newEqName').value = ''; el.querySelector('#newEqName').focus();
     draw();
   };
@@ -745,8 +878,11 @@ function openEqModal(){
       if(cur && cur.name === name && cur.prc === prc){ toast('변경사항 없음'); return; }
       commit('eq', d => { const x = d.equipment.find(q => q.name === oldName); if(x){ x.name = name; x.prc = prc; } }, `설비 수정 ${oldName} → ${name}(${prc})`);
       if(name !== oldName){
-        commit('hist', d => { if(d.pm[oldName] && !d.pm[name]){ d.pm[name] = d.pm[oldName]; delete d.pm[oldName]; } }, `이력 이름 변경 ${oldName} → ${name}`);
-        if(ui.sel && ui.sel.type === 'eq' && ui.sel.name === oldName){ ui.sel.name = name; lsSet('sel', ui.sel); render(); }
+        commit('hist', d => {
+          for(const hk of ['pm', 'cryo']){ const h = d[hk]; if(h && h[oldName] && !h[name]){ h[name] = h[oldName]; delete h[oldName]; } }
+        }, `이력 설비명 변경 ${oldName} → ${name}`);
+        for(const c in ui.sel){ const s = ui.sel[c]; if(s && s.type === 'eq' && s.name === oldName) s.name = name; }
+        lsSet('sel2', ui.sel); render();
       }
       toast('저장했습니다'); draw();
     }else if(e.target.classList.contains('ed')){
@@ -755,39 +891,23 @@ function openEqModal(){
       toast(`${oldName} 삭제됨`); draw();
     }
   });
-
-  el.querySelector('#addPrc').onclick = () => {
-    const p = el.querySelector('#newPrc').value.trim();
-    if(!p) return;
-    if(EQ().prcList.includes(p)){ toast('이미 있는 PRC입니다', true); return; }
-    commit('eq', d => { if(!d.prcList.includes(p)) d.prcList.push(p); d.parts[p] = d.parts[p] || []; }, `PRC 추가 ${p}`);
-    el.querySelector('#newPrc').value = ''; draw();
-  };
-  el.querySelector('#prcChips').addEventListener('click', async e => {
-    const p = e.target.dataset.delprc; if(!p) return;
-    const n = EQ().equipment.filter(x => x.prc === p).length;
-    if(n){ toast(`${p}에 설비 ${n}대가 있어 삭제할 수 없습니다. 설비를 먼저 옮기거나 삭제하세요.`, true); return; }
-    if(!await confirmBox(`PRC <b>${esc(p)}</b> 와(과) 그 부위/항목 목록을 정말로 삭제할까요?`)) return;
-    commit('eq', d => { d.prcList = d.prcList.filter(x => x !== p); delete d.parts[p]; }, `PRC 삭제 ${p}`);
-    draw();
-  });
 }
 
 /* =====================================================================
-   부위/항목 관리 (PRC별)
+   부위/항목 관리 (PM Part · PRC별) — 드래그로 순서 변경
    ===================================================================== */
 function openPartsModal(){
-  let prc = (ui.sel && ui.sel.type === 'prc') ? ui.sel.prc
-          : (selectedEquipment()[0] || {}).prc || allPrcs()[0];
+  const s = ui.sel.pm;
+  let prc = (s && s.type === 'prc') ? s.prc : (selectedEquipment('pm')[0] || {}).prc || allPrcs()[0];
   const m = openModal({
     title: '📋 부위 / 항목 관리', wide: 'wide',
     body: `
-      <div class="fld"><label>PRC 선택</label><select id="ptPrc"></select></div>
+      <div class="fld"><label>PRC 선택</label><select id="ptPrc" style="min-width:200px"></select></div>
       <div class="sec"><h4>항목 추가</h4>
         <div class="row"><input id="ptArea" placeholder="부위 (예: Beamline)" autocomplete="off"><input id="ptItem" placeholder="항목 (예: AMU)" autocomplete="off"><button class="pri" id="ptAdd">추가</button></div>
       </div>
       <div class="sec"><h4 id="ptCount">항목 목록</h4><div id="ptList"></div></div>
-      <div class="note">· 같은 PRC의 모든 설비에 같은 부위/항목이 적용됩니다.<br>· 같은 부위끼리 붙어 있으면 표에서 부위 칸이 합쳐집니다 (↑↓로 순서 변경).<br>· 이름을 바꾸면 기존 이력도 따라갑니다.</div>`,
+      <div class="note">· <b>⠿</b> 손잡이를 잡고 위아래로 끌어서 순서를 바꿀 수 있습니다.<br>· 같은 부위끼리 붙어 있으면 표에서 부위 칸이 합쳐집니다.<br>· 이름을 바꾸면 기존 이력도 따라갑니다.</div>`,
     buttons: [{ text: '닫기', cls: 'pri' }]
   });
   const el = m.el;
@@ -795,10 +915,17 @@ function openPartsModal(){
     el.querySelector('#ptPrc').innerHTML = allPrcs().map(p => `<option ${p === prc ? 'selected' : ''}>${esc(p)}</option>`).join('');
     const parts = EQ().parts[prc] || [];
     el.querySelector('#ptCount').textContent = `${prc} 항목 목록 (${parts.length})`;
-    el.querySelector('#ptList').innerHTML = parts.length ? `<table class="mini"><tr><th>부위</th><th>항목</th><th></th></tr>
-      ${parts.map((p, i) => `<tr data-id="${esc(p.id)}"><td><input class="pa" value="${esc(p.area)}"></td><td><input class="pi" value="${esc(p.item)}"></td>
-        <td style="white-space:nowrap;text-align:right"><button class="sm pu" ${i===0?'disabled':''}>↑</button> <button class="sm pd" ${i===parts.length-1?'disabled':''}>↓</button> <button class="sm ps">저장</button> <button class="sm danger px">삭제</button></td></tr>`).join('')}</table>`
+    el.querySelector('#ptList').innerHTML = parts.length ? `<table class="mini"><thead><tr><th></th><th>부위</th><th>항목</th><th></th></tr></thead><tbody>
+      ${parts.map(p => `<tr data-id="${esc(p.id)}"><td class="drag" title="끌어서 순서 변경">⠿</td><td><input class="pa" value="${esc(p.area)}"></td><td><input class="pi" value="${esc(p.item)}"></td>
+        <td style="white-space:nowrap;text-align:right"><button class="sm ps">저장</button> <button class="sm danger px">삭제</button></td></tr>`).join('')}</tbody></table>`
       : '<div class="note">항목이 없습니다.</div>';
+    const tb = el.querySelector('#ptList tbody');
+    if(tb) makeSortable(tb, ids => {
+      const P = prc, cur = (EQ().parts[P] || []).map(p => p.id);
+      if(ids.join() === cur.join()) return;
+      commit('eq', d => { d.parts[P] = reorderBy(d.parts[P] || [], ids, p => p.id); }, `${P} 항목 순서 변경`);
+      draw();
+    });
   }
   draw();
   el.querySelector('#ptPrc').onchange = e => { prc = e.target.value; draw(); };
@@ -814,8 +941,7 @@ function openPartsModal(){
       d.parts[P] = d.parts[P] || [];
       const arr = d.parts[P];
       if(arr.some(p => p.area === area && p.item === item)) return;
-      // 같은 부위가 있으면 그 부위 마지막 뒤에 넣기
-      let at = -1; arr.forEach((p, i) => { if(p.area === area) at = i; });
+      let at = -1; arr.forEach((p, i) => { if(p.area === area) at = i; });   // 같은 부위 뒤에 붙이기
       if(at >= 0) arr.splice(at + 1, 0, { id, area, item }); else arr.push({ id, area, item });
     }, `${P} 항목 추가 ${area}/${item}`);
     el.querySelector('#ptItem').value = ''; el.querySelector('#ptItem').focus();
@@ -827,11 +953,7 @@ function openPartsModal(){
     const tr = e.target.closest('tr[data-id]'); if(!tr || !e.target.matches('button')) return;
     const id = tr.dataset.id, P = prc;
     const cur = (EQ().parts[P] || []).find(p => p.id === id); if(!cur) return;
-    if(e.target.classList.contains('pu') || e.target.classList.contains('pd')){
-      const dir = e.target.classList.contains('pu') ? -1 : 1;
-      commit('eq', d => { const a = d.parts[P] || []; const i = a.findIndex(p => p.id === id), j = i + dir; if(i < 0 || j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; }, `${P} 항목 순서 변경`);
-      draw();
-    }else if(e.target.classList.contains('ps')){
+    if(e.target.classList.contains('ps')){
       const area = tr.querySelector('.pa').value.trim(), item = tr.querySelector('.pi').value.trim();
       if(!area || !item){ toast('부위와 항목을 모두 입력하세요', true); return; }
       if(area === cur.area && item === cur.item){ toast('변경사항 없음'); return; }
@@ -849,6 +971,79 @@ function openPartsModal(){
 }
 
 /* =====================================================================
+   Pump 추가/제거 (Cryo Pump · PRC별) — 드래그로 순서 변경
+   ===================================================================== */
+function openPumpModal(){
+  const s = ui.sel.cryo;
+  let prc = (s && s.type === 'prc') ? s.prc : (selectedEquipment('cryo')[0] || {}).prc || allPrcs()[0];
+  const m = openModal({
+    title: '🔧 Pump 추가 / 수정 / 제거', wide: 'wide',
+    body: `
+      <div class="fld"><label>PRC 선택</label><select id="pmPrc" style="min-width:200px"></select></div>
+      <div class="sec"><h4>Pump 추가</h4>
+        <div class="row"><input id="pmName" placeholder="Pump 명 (예: CP09)" autocomplete="off"><button class="pri" id="pmAdd">추가</button></div>
+        <div class="hint" id="pmHint"></div>
+      </div>
+      <div class="sec"><h4 id="pmCount">Pump 목록</h4><div id="pmList"></div></div>
+      <div class="note">· 같은 PRC의 모든 설비에 같은 Pump 목록이 적용됩니다.<br>· <b>⠿</b> 손잡이를 잡고 끌어서 순서를 바꿀 수 있습니다.<br>· Pump 이름을 바꾸면 기존 이력도 따라갑니다.</div>`,
+    buttons: [{ text: '닫기', cls: 'pri' }]
+  });
+  const el = m.el, hint = el.querySelector('#pmHint');
+  const eqNamesOf = p => EQ().equipment.filter(e => e.prc === p).map(e => e.name);
+  const pumpsOf = p => EQ().pumps[p] || [];
+  function draw(){
+    el.querySelector('#pmPrc').innerHTML = allPrcs().map(p => `<option value="${esc(p)}" ${p === prc ? 'selected' : ''}>${esc(p)}${pumpsOf(p).length ? ` (${pumpsOf(p).length})` : ''}</option>`).join('');
+    const list = pumpsOf(prc);
+    el.querySelector('#pmCount').textContent = `${prc} Pump 목록 (${list.length})`;
+    el.querySelector('#pmList').innerHTML = list.length ? `<table class="mini"><thead><tr><th></th><th>Pump 명</th><th></th></tr></thead><tbody>
+      ${list.map(n => `<tr data-id="${esc(n)}"><td class="drag" title="끌어서 순서 변경">⠿</td><td><input class="pn" value="${esc(n)}"></td>
+        <td style="white-space:nowrap;text-align:right;width:1%"><button class="sm ps">저장</button> <button class="sm danger px">삭제</button></td></tr>`).join('')}</tbody></table>`
+      : '<div class="note">이 PRC에는 Pump가 없습니다.</div>';
+    const tb = el.querySelector('#pmList tbody');
+    if(tb) makeSortable(tb, ids => {
+      const P = prc;
+      if(ids.join('\n') === pumpsOf(P).join('\n')) return;
+      commit('eq', d => { d.pumps[P] = reorderBy(d.pumps[P] || [], ids, n => n); }, `${P} Pump 순서 변경`);
+      draw();
+    });
+  }
+  const redraw = draw;
+  redraw();
+  el.querySelector('#pmPrc').onchange = e => { prc = e.target.value; redraw(); };
+
+  el.querySelector('#pmAdd').onclick = () => {
+    const name = el.querySelector('#pmName').value.trim();
+    if(!name){ hint.className = 'hint err'; hint.textContent = 'Pump 명을 입력하세요'; return; }
+    if(pumpsOf(prc).some(n => n.toLowerCase() === name.toLowerCase())){ hint.className = 'hint err'; hint.textContent = '이미 있는 Pump입니다'; return; }
+    const P = prc;
+    commit('eq', d => { d.pumps[P] = d.pumps[P] || []; if(!d.pumps[P].includes(name)) d.pumps[P].push(name); }, `${P} Pump 추가 ${name}`);
+    hint.className = 'hint okk'; hint.textContent = `${P} · ${name} 추가됨`;
+    el.querySelector('#pmName').value = ''; el.querySelector('#pmName').focus();
+    redraw();
+  };
+  el.querySelector('#pmName').addEventListener('keydown', e => { if(e.key === 'Enter') el.querySelector('#pmAdd').click(); });
+
+  el.querySelector('#pmList').addEventListener('click', async e => {
+    const tr = e.target.closest('tr[data-id]'); if(!tr || !e.target.matches('button')) return;
+    const oldN = tr.dataset.id, P = prc;
+    if(e.target.classList.contains('ps')){
+      const name = tr.querySelector('.pn').value.trim();
+      if(!name){ toast('Pump 명을 입력하세요', true); return; }
+      if(name === oldN){ toast('변경사항 없음'); return; }
+      if(pumpsOf(P).some(n => n !== oldN && n.toLowerCase() === name.toLowerCase())){ toast('이미 있는 Pump입니다', true); return; }
+      const names = eqNamesOf(P);
+      commit('eq', d => { const a = d.pumps[P] || []; const i = a.indexOf(oldN); if(i >= 0) a[i] = name; }, `${P} Pump 이름 변경 ${oldN} → ${name}`);
+      commit('hist', d => { for(const n of names){ const h = d.cryo[n]; if(h && h[oldN] && !h[name]){ h[name] = h[oldN]; delete h[oldN]; } } }, `${P} Pump 이력 이름 변경 ${oldN} → ${name}`);
+      toast('저장했습니다'); redraw();
+    }else if(e.target.classList.contains('px')){
+      if(!await confirmBox(`<b>${esc(P)}</b> 의 Pump 「${esc(oldN)}」 을(를) 정말로 삭제할까요?<br><span class="note">이력 기록은 파일에 남습니다.</span>`)) return;
+      commit('eq', d => { d.pumps[P] = (d.pumps[P] || []).filter(n => n !== oldN); }, `${P} Pump 삭제 ${oldN}`);
+      toast('삭제했습니다'); redraw();
+    }
+  });
+}
+
+/* =====================================================================
    설정 (GitHub 연동)
    ===================================================================== */
 function openSettings(){
@@ -858,7 +1053,7 @@ function openSettings(){
       <div class="fld"><label>내 이름 (변경 알림에 표시, 선택)</label><input id="sUser" value="${esc(userName)}" placeholder="예: 홍길동" style="width:100%"></div>
       <div class="fld"><label>GitHub 토큰 (Personal Access Token · 이 브라우저에만 저장)</label><input id="sToken" type="password" value="${esc(token)}" placeholder="ghp_... 또는 github_pat_..." style="width:100%" autocomplete="off"></div>
       <div class="fld"><label>API 주소</label><input id="sApi" value="${esc(cfg.apiBase)}" style="width:100%"><div class="hint">github.com → https://api.github.com &nbsp;/&nbsp; 사내 GitHub → https://사내주소/api/v3</div></div>
-      <div class="row" style="margin-bottom:12px">
+      <div class="row" style="margin-bottom:14px">
         <div style="flex:1"><label class="note"><b>Owner</b></label><input id="sOwner" value="${esc(cfg.owner)}" style="width:100%"></div>
         <div style="flex:1"><label class="note"><b>Repo</b></label><input id="sRepo" value="${esc(cfg.repo)}" style="width:100%"></div>
         <div style="flex:.6"><label class="note"><b>Branch</b></label><input id="sBranch" value="${esc(cfg.branch)}" style="width:100%"></div>
@@ -931,7 +1126,7 @@ function openModal({ title, body, buttons = [], wide }){
   });
   if(!buttons.length) mf.remove();
   ov.querySelector('.x').onclick = () => api.close();
-  ov.addEventListener('mousedown', e => { if(e.target === ov) ov._down = true; });
+  ov.addEventListener('mousedown', e => { ov._down = e.target === ov; });
   ov.addEventListener('click', e => { if(e.target === ov && ov._down) api.close(); ov._down = false; });
   document.body.appendChild(ov);
   modalStack.push(api);
@@ -944,7 +1139,7 @@ function confirmBox(msg, okText = '삭제'){
     let done = false;
     const m = openModal({
       title: '⚠ 확인',
-      body: `<div style="line-height:1.7">${msg}</div>`,
+      body: `<div style="line-height:1.7;font-size:15.5px">${msg}</div>`,
       buttons: [
         { text: '취소', onClick: () => { done = true; res(false); } },
         { text: okText, cls: 'pri', onClick: () => { done = true; res(true); } }
