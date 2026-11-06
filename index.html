@@ -28,7 +28,7 @@ input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-
 /* ---------- 헤더 ---------- */
 header{background:#1e293b;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:40;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.3px}
-.sync{margin-left:auto;display:flex;align-items:center;gap:9px;background:#0f172a;border:1px solid #334155;border-radius:999px;padding:6px 14px 6px 10px;font-size:13px;cursor:pointer;user-select:none;min-width:200px}
+.sync{margin-left:auto;display:flex;align-items:center;gap:9px;background:#0f172a;border:1px solid #334155;border-radius:999px;padding:6px 14px 6px 10px;font-size:13px;cursor:default;user-select:none;min-width:200px}
 .light{display:flex;gap:4px;background:#020617;padding:3px 5px;border-radius:999px}
 .light i{width:11px;height:11px;border-radius:50%;background:#334155;display:block;transition:.2s}
 .sync[data-s=ok] .light .g{background:var(--green);box-shadow:0 0 7px var(--green)}
@@ -77,6 +77,16 @@ table.ph td.d{min-width:88px;font-variant-numeric:tabular-nums;font-size:15px;fo
 table.ph td.d.rep{background:var(--rep);color:var(--rep-t)}
 table.ph td.d.cln{background:var(--cln);color:var(--cln-t)}
 table.ph td.d.latest{background:#fff1a8;box-shadow:inset 0 0 0 3px #f59e0b;font-weight:800}
+table.ph td.d[data-i]{cursor:pointer;position:relative}
+table.ph td.d[data-i]:hover{filter:brightness(.92);outline:2px solid var(--pri);outline-offset:-2px}
+table.ph td.d.memo::after{content:"";position:absolute;top:0;right:0;border-left:11px solid transparent;border-top:11px solid #ef4444}
+.einfo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:14px;color:#475569}
+.einfo .v{font-weight:800;font-size:17px;padding:4px 12px;border-radius:7px;font-variant-numeric:tabular-nums}
+.einfo .v.rep{background:var(--rep);color:var(--rep-t)}.einfo .v.cln{background:var(--cln);color:var(--cln-t)}
+.modal textarea.memo-ta{font-family:inherit;font-size:15px;white-space:pre-wrap;min-height:120px}
+details.more{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:4px}
+details.more summary{cursor:pointer;font-weight:700;font-size:14px;color:#334155}
+details.more[open] summary{margin-bottom:12px}
 table.ph td.noparts{color:var(--sub);text-align:left;font-weight:500}
 table.ph tr.eqstart td{border-top:3px solid #475569}
 table.ph tbody tr:first-child td{border-top:1px solid var(--grid)}
@@ -162,7 +172,7 @@ tr.dragging{opacity:.45;background:#eef4ff}
 
 <header>
   <h1>파트 이력 관리 시스템</h1>
-  <div class="sync" id="sync" data-s="local" title="클릭하면 연동 설정">
+  <div class="sync" id="sync" data-s="local">
     <span class="light"><i class="r"></i><i class="y"></i><i class="g"></i></span>
     <span id="syncText">준비 중…</span>
   </div>
@@ -194,7 +204,9 @@ tr.dragging{opacity:.45;background:#eef4ff}
       <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
       <span><b style="background:var(--rep);border:1px solid #86efac"></b>교체 (YYMMDD)</span>
       <span><b style="background:var(--cln);border:1px solid #93c5fd"></b>CLN (YYMMDD CLN)</span>
-      <span>· 입력 칸의 🖱 버튼을 눌러 이력 추가/수정/삭제</span>
+      <span>· 입력 칸의 🖱 버튼 = 이력 추가</span>
+      <span>· 기록된 날짜 클릭 = 메모 보기/작성 · 수정 · 삭제</span>
+      <span><b style="background:linear-gradient(225deg,#ef4444 30%,#fff 30%);border:1px solid var(--line)"></b>메모 있음</span>
     </div>
   </section>
 
@@ -213,7 +225,9 @@ tr.dragging{opacity:.45;background:#eef4ff}
     <div class="tablearea"></div>
     <div class="legend">
       <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
-      <span>· 입력 칸의 🖱 버튼을 눌러 이력 추가/수정/삭제</span>
+      <span>· 입력 칸의 🖱 버튼 = 이력 추가</span>
+      <span>· 기록된 날짜 클릭 = 메모 보기/작성 · 수정 · 삭제</span>
+      <span><b style="background:linear-gradient(225deg,#ef4444 30%,#fff 30%);border:1px solid var(--line)"></b>메모 있음</span>
     </div>
   </section>
 
@@ -232,7 +246,8 @@ const DEFAULT_CONFIG = {
   repo:    '',                         // 저장소 이름
   branch:  'main',                     // 브랜치
   profile: 'default',                  // 명명법(프로필) → data/equipment_프로필.json, data/history_프로필.json
-  pollSec: 10                          // 몇 초마다 다른 사람 변경사항 확인할지
+  pollSec: 10,                         // 몇 초마다 다른 사람 변경사항 확인할지
+  token:   ''                          // 공용 토큰을 여기 넣으면 모든 PC에서 설정 없이 바로 연동 (⚙설정에 넣은 토큰이 있으면 그게 우선)
 };
 
 /* =====================================================================
@@ -315,16 +330,15 @@ function fixApi(s){
   return u.origin + '/api/v3';           // 사내 GitHub(Enterprise)
 }
 cfg.apiBase = fixApi(cfg.apiBase);
-let token = lsGet('token', '');
-let userName = lsGet('user', '');
+let token = lsGet('token', '') || DEFAULT_CONFIG.token || '';
 const isRemote = () => !!(token && cfg.owner && cfg.repo);
 const FILES = {
   eq:   () => `data/equipment_${cfg.profile}.json`,
   hist: () => `data/history_${cfg.profile}.json`
 };
 const EMPTY = {
-  eq:   () => ({ profile: cfg.profile, prcList: ['HC_C','LE','HE','HVMS'], equipment: [], parts: {}, pumps: {}, updatedAt: null, updatedBy: '' }),
-  hist: () => ({ version: 1, pm: {}, cryo: {}, updatedAt: null, updatedBy: '' })
+  eq:   () => ({ profile: cfg.profile, prcList: ['HC_C','LE','HE','HVMS'], equipment: [], parts: {}, pumps: {} }),
+  hist: () => ({ version: 1, pm: {}, cryo: {} })
 };
 
 /* =====================================================================
@@ -430,6 +444,9 @@ function normalize(key, d){
   }else{
     d.pm = d.pm && typeof d.pm === 'object' ? d.pm : {};
     d.cryo = d.cryo && typeof d.cryo === 'object' ? d.cryo : {};
+    for(const hk of ['pm', 'cryo']) for(const eqn in d[hk]) for(const k in d[hk][eqn]) for(const x of d[hk][eqn][k]){ delete x.by; delete x.at; delete x.memoBy; delete x.memoAt; }
+  }
+  if(d){ delete d.updatedBy; delete d.updatedAt;
   }
 }
 
@@ -451,18 +468,17 @@ async function flush(key, op){
     try{
       const next = clone(s.remote);
       op.fn(next);
-      next.updatedAt = new Date().toISOString();
-      next.updatedBy = userName || '';
-      const nsha = await backend().put(FILES[key](), next, s.sha, `[파트이력] ${op.msg}${userName ? ' - ' + userName : ''}`);
+      delete next.updatedAt; delete next.updatedBy;
+      const nsha = await backend().put(FILES[key](), next, s.sha, `[파트이력] ${op.msg}`);
       s.remote = next; s.sha = nsha;
       s.pending.splice(s.pending.indexOf(op), 1);
       rebuild(key); render();
-      markChanged('저장됨', userName);
+      markChanged('저장됨');
       return;
     }catch(e){
       lastErr = e;
       if(e.conflict){ try{ await reload(key); }catch(_){} await sleep(300 + Math.random()*700); continue; }
-      if(e.status === 401 || e.status === 403 || e.status === 404) break;   // 권한 문제는 재시도 의미 없음
+      if(e.status === 401 || e.status === 403 || e.status === 404){ authErr = true; paintSettingsBtn(); break; }   // 권한 문제는 재시도 의미 없음
       setStatus('err', `저장 실패 – 재시도 중… (${e.status ? 'HTTP ' + e.status : '네트워크'})`);
       await sleep(1500 * (attempt + 1));
     }
@@ -489,12 +505,12 @@ async function poll(){
     rebuild('eq'); rebuild('hist');
     if(c1 || c2){
       render();
-      const src = c2 ? store.hist.remote : store.eq.remote;
-      markChanged('수정됨', src.updatedBy);
+      markChanged('수정됨');
     }else if(curStatus !== 'changed'){
       setStatus(isRemote() ? 'ok' : 'local', baseOkText());
     }
   }catch(e){
+    if([401, 403, 404].includes(e.status)){ authErr = true; paintSettingsBtn(); }
     setStatus('err', e.status ? `연동 오류 (${errText(e.status)})` : '연결 끊김 – 재시도 중');
   }
 }
@@ -516,9 +532,9 @@ function setStatus(s, text){
   const el = $('#sync'); el.dataset.s = s;
   $('#syncText').textContent = text;
 }
-function markChanged(word, by){
+function markChanged(word){
   lastChangeTime = hhmmss();
-  setStatus('changed', `${lastChangeTime} ${word}${by ? ' (' + by + ')' : ''}`);
+  setStatus('changed', `${lastChangeTime} ${word}`);
   clearTimeout(statusTimer);
   statusTimer = setTimeout(() => { if(curStatus === 'changed') setStatus(isRemote() ? 'ok' : 'local', baseOkText()); }, 6000);
 }
@@ -629,7 +645,10 @@ function buildTable(cat, eqList, cols, fixed){
       h += `<td class="in"><button class="inbtn" title="이력 입력" data-cat="${cat}" data-eq="${esc(eq.name)}" data-key="${esc(r.key)}">${CLICK_ICON}</button></td>`;
       for(let i = 0; i < cols; i++){
         const e = ents[i];
-        if(e) h += `<td class="d ${e.t==='CLN' ? 'cln' : 'rep'} ${i===0 ? 'latest' : ''}">${esc(entryText(e))}</td>`;
+        if(e){
+          const tip = [entryText(e), e.memo ? `메모: ${e.memo}` : '', '(클릭: 메모·수정·삭제)'].filter(Boolean).join('\n');
+          h += `<td class="d ${e.t==='CLN' ? 'cln' : 'rep'} ${i===0 ? 'latest' : ''} ${e.memo ? 'memo' : ''}" data-cat="${cat}" data-eq="${esc(eq.name)}" data-key="${esc(r.key)}" data-i="${i}" title="${esc(tip)}">${esc(entryText(e))}</td>`;
+        }
         else  h += `<td class="d"></td>`;
       }
       h += `</tr>`;
@@ -661,6 +680,8 @@ document.addEventListener('click', e => {
     ui.sel[b.dataset.cat] = eb ? { type: 'eq', name: eb.dataset.eq } : { type: 'prc', prc: pb.dataset.prc };
     lsSet('sel2', ui.sel); render(); return;
   }
+  const dc = e.target.closest('table.ph td.d[data-i]');
+  if(dc){ openMemoModal(dc.dataset.cat, dc.dataset.eq, dc.dataset.key, +dc.dataset.i); return; }
   const ib = e.target.closest('.inbtn');
   if(ib){ openEntryModal(ib.dataset.cat, ib.dataset.eq, ib.dataset.key); return; }
   const tb = e.target.closest('.toolbar [data-do]');
@@ -670,7 +691,6 @@ document.addEventListener('click', e => {
   }
 });
 $('#btnSettings').onclick = openSettings;
-$('#sync').onclick = openSettings;
 
 /* =====================================================================
    이력 입력 팝업 (추가 / 수정 / 삭제) — 🖱 버튼 하나로만 열림
@@ -687,113 +707,115 @@ function opAddEntry(hk, eqName, key, entry){
 }
 function mkEntry(mod, d, t){ return mod.hasType ? { d, t } : { d }; }
 
+function findRow(cat, eqName, key){
+  const eq = EQ().equipment.find(x => x.name === eqName); if(!eq) return null;
+  return MODS[cat].rows(eq).find(r => r.key === key) || null;
+}
+/* 날짜 입력칸(달력+직접입력) + 구분 버튼 공용 */
+function bindDateForm(el, mod, init){
+  const dateEl = el.querySelector('.fDate'), txtEl = el.querySelector('.fText'), hint = el.querySelector('.fHint');
+  const segBtns = el.querySelectorAll('.seg button');
+  const st = { type: init.t || '교체' };
+  const paintSeg = () => segBtns.forEach(b => b.classList.toggle('on', b.dataset.t === st.type));
+  st.showHint = () => {
+    const v = normDate(txtEl.value);
+    if(!txtEl.value.trim()){ hint.className = 'hint fHint'; hint.textContent = ''; return null; }
+    if(v){ hint.className = 'hint fHint okk'; hint.textContent = `→ 표에는 「${entryText(mkEntry(mod, v, st.type))}」 로 기록`; dateEl.value = ymdToIso(v); }
+    else { hint.className = 'hint fHint err'; hint.textContent = '날짜 형식이 올바르지 않습니다 (예: 260910 / 26.09.10)'; }
+    return v;
+  };
+  st.err = msg => { hint.className = 'hint fHint err'; hint.textContent = msg; };
+  st.value = () => normDate(txtEl.value);
+  segBtns.forEach(b => b.onclick = () => { st.type = b.dataset.t; paintSeg(); st.showHint(); });
+  dateEl.onchange = () => { txtEl.value = isoToYmd(dateEl.value); st.showHint(); };
+  txtEl.oninput = st.showHint;
+  txtEl.value = init.d; dateEl.value = ymdToIso(init.d);
+  paintSeg(); st.showHint();
+  st.txtEl = txtEl;
+  return st;
+}
+const dateFormHTML = mod => `
+  <div class="fld"><label>날짜 (달력 선택 또는 직접 입력)</label>
+    <div class="row"><input type="date" class="fDate"><input class="fText" placeholder="YYMMDD 또는 YY.MM.DD" maxlength="10" inputmode="numeric" autocomplete="off"></div>
+    <div class="hint fHint"></div>
+  </div>
+  ${mod.hasType ? `<div class="fld"><label>구분</label><div class="seg"><button data-t="교체">교체</button><button data-t="CLN">CLN</button></div></div>` : ''}`;
+
+/* 🖱 버튼 → 이력 추가 */
 function openEntryModal(cat, eqName, key){
   const mod = MODS[cat], hk = mod.hk;
-  const eq = EQ().equipment.find(x => x.name === eqName); if(!eq) return;
-  const row = mod.rows(eq).find(r => r.key === key); if(!row) return;
-  let type = '교체';
-  let editing = null;   // 수정 중인 기록
+  const row = findRow(cat, eqName, key); if(!row) return;
   const m = openModal({
-    title: '이력 입력',
+    title: '이력 추가',
+    body: `<div class="target">${esc(eqName)} · ${esc(row.title)}</div>${dateFormHTML(mod)}
+      <div class="fld"><label>메모 (선택)</label><textarea class="memo-ta" id="enMemo" style="min-height:70px" placeholder="필요할 때만 입력"></textarea></div>`,
+    buttons: [{ text: '취소' }, { text: '추가', cls: 'pri', onClick: () => save() }]
+  });
+  const f = bindDateForm(m.el, mod, { d: todayYMD(), t: '교체' });
+  f.txtEl.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(save() !== false) m.close(); } });
+  setTimeout(() => { f.txtEl.focus(); f.txtEl.select(); }, 30);
+  function save(){
+    const v = f.value();
+    if(!v){ f.err('날짜를 확인해 주세요 (예: 260910 / 26.09.10)'); return false; }
+    const ne = mkEntry(mod, v, f.type);
+    const memo = m.el.querySelector('#enMemo').value.trim();
+    if(memo) ne.memo = memo;
+    if(getEntries(hk, eqName, key).some(x => sameEntry(x, ne))){ f.err('같은 날짜·구분의 기록이 이미 있습니다'); return false; }
+    commit('hist', opAddEntry(hk, eqName, key, ne), `${eqName} ${row.name} ${entryText(ne)} 추가`);
+    toast(`${eqName} · ${row.name} — ${entryText(ne)} 추가`);
+  }
+}
+
+/* 기록된 날짜 클릭 → 메모 보기/작성 + 날짜 수정 + 삭제 */
+function openMemoModal(cat, eqName, key, idx){
+  const mod = MODS[cat], hk = mod.hk;
+  const row = findRow(cat, eqName, key); if(!row) return;
+  const e0 = getEntries(hk, eqName, key)[idx]; if(!e0) return;
+  const old = clone(e0);
+  const m = openModal({
+    title: '📝 메모 / 이력 수정',
     body: `
       <div class="target">${esc(eqName)} · ${esc(row.title)}</div>
-      <div id="enEditBar"></div>
-      <div class="fld"><label>날짜 (달력 선택 또는 직접 입력)</label>
-        <div class="row">
-          <input type="date" id="enDate">
-          <input id="enText" placeholder="YYMMDD 또는 YY.MM.DD" maxlength="10" inputmode="numeric" autocomplete="off">
-        </div>
-        <div class="hint" id="enHint"></div>
-      </div>
-      ${mod.hasType ? `<div class="fld"><label>구분</label>
-        <div class="seg"><button data-t="교체">교체</button><button data-t="CLN">CLN</button></div>
-      </div>` : ''}
-      <div class="row" style="justify-content:flex-end;margin-bottom:18px"><button class="pri" id="enSave" style="min-width:140px">추가</button></div>
-      <div class="sec" style="margin-bottom:0"><h4 id="enCount">기록된 이력</h4><div class="hlist" id="enList"></div></div>`,
-    buttons: [{ text: '닫기' }]
+      <div class="einfo"><span class="v ${old.t === 'CLN' ? 'cln' : 'rep'}">${esc(entryText(old))}</span></div>
+      <div class="fld"><label>메모</label><textarea class="memo-ta" id="mmText" placeholder="예: 파손으로 조기 교체 / 다음 PM 때 재확인 필요">${esc(old.memo || '')}</textarea></div>
+      <details class="more"><summary>날짜 · 구분 수정</summary>${dateFormHTML(mod)}</details>`,
+    buttons: [
+      { text: '🗑 이력 삭제', cls: 'danger left', onClick: async () => {
+          if(!await confirmBox(`<b>${esc(eqName)} · ${esc(row.name)}</b><br>「${esc(entryText(old))}」 이력${old.memo ? '과 메모' : ''}를 정말로 삭제할까요?`)) return false;
+          commit('hist', d => {
+            const arr = d[hk] && d[hk][eqName] && d[hk][eqName][key]; if(!arr) return;
+            const i = arr.findIndex(y => sameEntry(y, old)); if(i >= 0) arr.splice(i, 1);
+          }, `${eqName} ${row.name} ${entryText(old)} 삭제`);
+          toast('삭제했습니다');
+        } },
+      { text: '취소' },
+      { text: '저장', cls: 'pri', onClick: () => save() }
+    ]
   });
-  const el = m.el;
-  const dateEl = el.querySelector('#enDate'), txtEl = el.querySelector('#enText'), hint = el.querySelector('#enHint');
-  const segBtns = el.querySelectorAll('.seg button');
-  const paintSeg = () => segBtns.forEach(b => b.classList.toggle('on', b.dataset.t === type));
-  segBtns.forEach(b => b.onclick = () => { type = b.dataset.t; paintSeg(); showHint(); });
-
-  function setForm(d, t){
-    txtEl.value = d; dateEl.value = ymdToIso(d); type = t || '교체'; paintSeg(); showHint();
-  }
-  function showHint(){
-    const v = normDate(txtEl.value);
-    if(!txtEl.value.trim()){ hint.className = 'hint'; hint.textContent = ''; return null; }
-    if(v){ hint.className = 'hint okk'; hint.textContent = `→ 표에는 「${entryText(mkEntry(mod, v, type))}」 로 기록`; dateEl.value = ymdToIso(v); }
-    else { hint.className = 'hint err'; hint.textContent = '날짜 형식이 올바르지 않습니다 (예: 260910 / 26.09.10)'; }
-    return v;
-  }
-  function drawList(){
-    const ents = getEntries(hk, eqName, key);
-    el.querySelector('#enCount').textContent = `기록된 이력 (${ents.length}건 · 최신순)`;
-    el.querySelector('#enList').innerHTML = ents.length ? ents.map((x, i) => `
-      <div class="hi ${editing && sameEntry(editing, x) ? 'editing' : ''}" data-i="${i}">
-        <span class="no">${i+1}</span>
-        <span class="v ${x.t==='CLN' ? 'cln' : 'rep'}">${esc(entryText(x))}</span>
-        <span class="sp"></span>
-        <button class="sm" data-a="edit">수정</button>
-        <button class="sm danger" data-a="del">삭제</button>
-      </div>`).join('') : '<div class="empty">아직 기록이 없습니다.</div>';
-  }
-  function setEditing(x){
-    editing = x;
-    el.querySelector('#enEditBar').innerHTML = x ? `<div class="editbar">✏ 「${esc(entryText(x))}」 수정 중 <span style="flex:1"></span><button class="sm" id="enCancelEdit">수정 취소</button></div>` : '';
-    el.querySelector('#enSave').textContent = x ? '수정 저장' : '추가';
-    if(x){ setForm(x.d, x.t); el.querySelector('#enCancelEdit').onclick = () => { setEditing(null); setForm(todayYMD(), '교체'); }; }
-    drawList();
-  }
-
-  dateEl.onchange = () => { txtEl.value = isoToYmd(dateEl.value); showHint(); };
-  txtEl.oninput = showHint;
-  txtEl.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); save(); } });
-  el.querySelector('#enSave').onclick = save;
-  el.querySelector('#enList').addEventListener('click', async e => {
-    const b = e.target.closest('button[data-a]'); if(!b) return;
-    const x = getEntries(hk, eqName, key)[+b.closest('.hi').dataset.i]; if(!x) return;
-    if(b.dataset.a === 'edit'){ setEditing(clone(x)); txtEl.focus(); return; }
-    if(!await confirmBox(`<b>${esc(eqName)} · ${esc(row.name)}</b><br>「${esc(entryText(x))}」 이력을 정말로 삭제할까요?`)) return;
+  const f = bindDateForm(m.el, mod, { d: old.d, t: old.t });
+  setTimeout(() => { const t = m.el.querySelector('#mmText'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); }, 30);
+  async function save(){
+    const memo = m.el.querySelector('#mmText').value.trim();
+    const v = f.value();
+    if(!v){ m.el.querySelector('details.more').open = true; f.err('날짜를 확인해 주세요 (예: 260910 / 26.09.10)'); return false; }
+    const ne = mkEntry(mod, v, f.type);
+    const dateChanged = !sameEntry(ne, old), memoChanged = memo !== (old.memo || '');
+    if(!dateChanged && !memoChanged) return;
+    if(dateChanged && getEntries(hk, eqName, key).some(x => sameEntry(x, ne))){ m.el.querySelector('details.more').open = true; f.err('같은 날짜·구분의 기록이 이미 있습니다'); return false; }
+    if(memoChanged && !memo && old.memo){
+      if(!await confirmBox('메모를 정말로 삭제할까요?')) return false;
+    }
     commit('hist', d => {
       const arr = d[hk] && d[hk][eqName] && d[hk][eqName][key]; if(!arr) return;
-      const i = arr.findIndex(y => sameEntry(y, x)); if(i >= 0) arr.splice(i, 1);
-    }, `${eqName} ${row.name} ${entryText(x)} 삭제`);
-    if(editing && sameEntry(editing, x)){ setEditing(null); setForm(todayYMD(), '교체'); }
-    toast('삭제했습니다'); drawList();
-  });
-
-  function save(){
-    const v = normDate(txtEl.value);
-    if(!v){ hint.className = 'hint err'; hint.textContent = '날짜를 확인해 주세요 (예: 260910 / 26.09.10)'; return; }
-    const ne = mkEntry(mod, v, type);
-    const ents = getEntries(hk, eqName, key);
-    if(ents.some(x => sameEntry(x, ne) && !(editing && sameEntry(x, editing)))){ hint.className = 'hint err'; hint.textContent = '같은 날짜·구분의 기록이 이미 있습니다'; return; }
-    if(editing){
-      const old = editing;
-      if(!sameEntry(old, ne)){
-        commit('hist', d => {
-          d[hk] = d[hk] || {}; d[hk][eqName] = d[hk][eqName] || {};
-          const arr = d[hk][eqName][key] = d[hk][eqName][key] || [];
-          const i = arr.findIndex(y => sameEntry(y, old));
-          if(i >= 0) arr[i] = clone(ne); else arr.push(clone(ne));
-          sortEntries(arr);
-        }, `${eqName} ${row.name} ${entryText(old)} → ${entryText(ne)}`);
-        toast(`수정: ${entryText(old)} → ${entryText(ne)}`);
+      const x = arr.find(y => sameEntry(y, old)); if(!x) return;
+      x.d = ne.d; if(mod.hasType) x.t = ne.t;
+      if(memoChanged){
+        if(memo) x.memo = memo; else delete x.memo;
       }
-      setEditing(null); setForm(todayYMD(), '교체');
-    }else{
-      commit('hist', opAddEntry(hk, eqName, key, ne), `${eqName} ${row.name} ${entryText(ne)} 추가`);
-      toast(`${eqName} · ${row.name} — ${entryText(ne)} 추가`);
-      m.close();
-    }
+      sortEntries(arr);
+    }, `${eqName} ${row.name} ${entryText(old)}${dateChanged ? ' → ' + entryText(ne) : ''}${memoChanged ? ' 메모' : ''} 수정`);
+    toast(memoChanged ? '메모를 저장했습니다' : '수정했습니다');
   }
-
-  setForm(todayYMD(), '교체');
-  drawList();
-  setTimeout(() => { txtEl.focus(); txtEl.select(); }, 30);
 }
 
 /* =====================================================================
@@ -1311,7 +1333,6 @@ function openSettings(){
   const m = openModal({
     title: '⚙ 연동 설정', wide: 'wide',
     body: `
-      <div class="fld"><label>내 이름 (변경 알림에 표시, 선택)</label><input id="sUser" value="${esc(userName)}" placeholder="예: 홍길동" style="width:100%"></div>
       <div class="fld"><label>GitHub 토큰 (Personal Access Token · 이 브라우저에만 저장)</label><input id="sToken" type="password" value="${esc(token)}" placeholder="ghp_... 또는 github_pat_..." style="width:100%" autocomplete="off"></div>
       <div class="fld"><label>API 주소</label><input id="sApi" value="${esc(cfg.apiBase)}" style="width:100%"><div class="hint">github.com → https://api.github.com &nbsp;/&nbsp; 사내 GitHub → https://사내주소/api/v3</div></div>
       <div class="row" style="margin-bottom:14px">
@@ -1333,7 +1354,6 @@ function openSettings(){
   });
   const v = id => m.el.querySelector(id).value.trim();
   function apply(){
-    userName = v('#sUser'); lsSet('user', userName);
     token = v('#sToken'); lsSet('token', token);
     cfg = Object.assign(cfg, { apiBase: fixApi(v('#sApi')), owner: v('#sOwner'), repo: v('#sRepo'), branch: v('#sBranch') || 'main', profile: v('#sProfile') || 'default' });
     lsSet('cfg', { apiBase: cfg.apiBase, owner: cfg.owner, repo: cfg.repo, branch: cfg.branch, profile: cfg.profile });
@@ -1353,7 +1373,13 @@ function openSettings(){
     }catch(e){ h.className = 'hint err'; h.textContent = '연결 실패: 주소를 확인하세요 (' + e.message + ')'; }
   }
 }
+/* ⚙ 설정 버튼: 연결이 정상이면 숨김. 연결 안 됨/토큰·권한 오류일 때만 보임.
+   숨겨져 있어도 주소 뒤에 ?setting 을 붙여 열면 설정 창이 뜸 */
+let authErr = false;
+const forceSetting = new URLSearchParams(location.search).has('setting');
+function paintSettingsBtn(){ $('#btnSettings').hidden = !(forceSetting || !isRemote() || authErr); }
 async function restart(){
+  authErr = false;
   store.eq.pending = []; store.hist.pending = [];
   setStatus('busy', '불러오는 중…');
   try{
@@ -1364,8 +1390,10 @@ async function restart(){
     if(!store.eq.remote){ store.eq.remote = EMPTY.eq(); store.eq.sha = null; }
     if(!store.hist.remote){ store.hist.remote = EMPTY.hist(); store.hist.sha = null; }
     rebuild('eq'); rebuild('hist'); render();
+    authErr = true;
     setStatus('err', e.status ? `연동 오류 (${errText(e.status)})` : '연결 실패 – ⚙설정 확인');
   }
+  paintSettingsBtn();
   startPolling();
 }
 
@@ -1425,7 +1453,7 @@ function toast(msg, isErr){
 /* =====================================================================
    시작
    ===================================================================== */
-restart();
+restart().then(() => { if(forceSetting) openSettings(); });
 </script>
 </body>
 </html>
