@@ -126,6 +126,10 @@
     {
       "name": "IVV3723_3",
       "prc": "HVMS"
+    },
+    {
+      "name": "IVV3722_3",
+      "prc": "HVMS"
     }
   ],
   "parts": {
@@ -173,6 +177,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:33:25.643Z",
+  "updatedAt": "2026-11-06T12:33:33.775Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
