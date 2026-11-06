@@ -172,6 +172,11 @@
         "item": "Quad"
       },
       {
+        "id": "p_mw4yoismmrhq",
+        "area": "Beamline",
+        "item": "SRA"
+      },
+      {
         "id": "p_mw4ympynonqw",
         "area": "Chamber",
         "item": "PEF"
@@ -214,6 +219,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:16.443Z",
+  "updatedAt": "2026-11-06T12:39:20.618Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
