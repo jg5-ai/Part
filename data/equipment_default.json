@@ -1,28 +1,88 @@
 {
   "profile": "default",
-  "prcList": ["HC_C", "LE", "HE", "HVMS"],
+  "prcList": [
+    "HC_C",
+    "LE",
+    "HE",
+    "HVMS"
+  ],
   "equipment": [
-    { "name": "IAH3701", "prc": "HC_C" },
-    { "name": "IAH3702", "prc": "HC_C" },
-    { "name": "IAT3741", "prc": "LE" },
-    { "name": "IAT3742", "prc": "LE" },
-    { "name": "IAE3701", "prc": "HE" },
-    { "name": "IAE3702", "prc": "HE" },
-    { "name": "IVV3721_2", "prc": "HVMS" },
-    { "name": "IVV3721_3", "prc": "HVMS" }
+    {
+      "name": "IAH3701",
+      "prc": "HC_C"
+    },
+    {
+      "name": "IAH3702",
+      "prc": "HC_C"
+    },
+    {
+      "name": "IAT3741",
+      "prc": "LE"
+    },
+    {
+      "name": "IAT3742",
+      "prc": "LE"
+    },
+    {
+      "name": "IAE3701",
+      "prc": "HE"
+    },
+    {
+      "name": "IAE3702",
+      "prc": "HE"
+    },
+    {
+      "name": "IVV3721_2",
+      "prc": "HVMS"
+    },
+    {
+      "name": "IVV3721_3",
+      "prc": "HVMS"
+    }
   ],
   "parts": {
     "HC_C": [
-      { "id": "p_hcc_1", "area": "Beamline", "item": "AMU" }
+      {
+        "id": "p_hcc_1",
+        "area": "Beamline",
+        "item": "AMU"
+      }
     ],
     "LE": [
-      { "id": "p_le_1", "area": "Beamline", "item": "AMU" }
+      {
+        "id": "p_le_1",
+        "area": "Beamline",
+        "item": "AMU"
+      }
     ],
     "HE": [
-      { "id": "p_he_1", "area": "Beamline", "item": "AMU" }
+      {
+        "id": "p_he_1",
+        "area": "Beamline",
+        "item": "AMU"
+      }
     ],
     "HVMS": [
-      { "id": "p_hvms_1", "area": "Beamline", "item": "AMU" }
+      {
+        "id": "p_hvms_1",
+        "area": "Beamline",
+        "item": "AMU"
+      }
+    ]
+  },
+  "pumps": {
+    "HC_C": [
+      "CP09",
+      "CP10"
+    ],
+    "LE": [
+      "CP09",
+      "CP11",
+      "CP12",
+      "CP13"
+    ],
+    "HE": [
+      "CP09"
     ]
   },
   "updatedAt": null,
