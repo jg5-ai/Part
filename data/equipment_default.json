@@ -114,6 +114,10 @@
     {
       "name": "IAE3801",
       "prc": "HE"
+    },
+    {
+      "name": "IAE3802",
+      "prc": "HE"
     }
   ],
   "parts": {
@@ -161,6 +165,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:32:41.098Z",
+  "updatedAt": "2026-11-06T12:32:42.384Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
