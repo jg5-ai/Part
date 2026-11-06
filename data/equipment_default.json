@@ -42,6 +42,10 @@
     {
       "name": "IAH3703",
       "prc": "HC_C"
+    },
+    {
+      "name": "IAH3704",
+      "prc": "HC_C"
     }
   ],
   "parts": {
@@ -89,6 +93,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:29:21.532Z",
+  "updatedAt": "2026-11-06T12:30:11.543Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
