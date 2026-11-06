@@ -94,6 +94,10 @@
     {
       "name": "IAH3802",
       "prc": "LE"
+    },
+    {
+      "name": "IAH3803",
+      "prc": "LE"
     }
   ],
   "parts": {
@@ -141,6 +145,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:31:16.978Z",
+  "updatedAt": "2026-11-06T12:31:18.631Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
