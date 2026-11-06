@@ -157,14 +157,14 @@
         "item": "AMU"
       },
       {
-        "id": "p_mw4yikijx0z3",
-        "area": "Beamline",
-        "item": "Corrector"
-      },
-      {
         "id": "p_mw4yoismmrhq",
         "area": "Beamline",
         "item": "SRA"
+      },
+      {
+        "id": "p_mw4yikijx0z3",
+        "area": "Beamline",
+        "item": "Corrector"
       },
       {
         "id": "p_mw4ym9xx81b6",
@@ -229,6 +229,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:32.418Z",
+  "updatedAt": "2026-11-06T12:39:33.789Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
