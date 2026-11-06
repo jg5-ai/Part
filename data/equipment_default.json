@@ -182,6 +182,11 @@
         "item": "HSG"
       },
       {
+        "id": "p_mw4yoq20egyw",
+        "area": "Beamline",
+        "item": "Beam Stopper"
+      },
+      {
         "id": "p_mw4ympynonqw",
         "area": "Chamber",
         "item": "PEF"
@@ -224,6 +229,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:24.636Z",
+  "updatedAt": "2026-11-06T12:39:30.028Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
