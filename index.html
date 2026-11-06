@@ -64,7 +64,6 @@ main{padding:14px 20px 40px}
 .tblwrap{overflow-x:auto;border:2px solid var(--grid-head);border-radius:10px;background:#fff}
 table.ph{border-collapse:collapse;width:100%;min-width:1000px;font-size:15px;font-weight:600}
 table.ph th{background:#e2e8f0;color:#1e293b;font-weight:800;font-size:14.5px;padding:9px 6px;border:1px solid var(--grid-head);white-space:nowrap}
-table.ph th.latest-h{background:#fde68a;color:#78350f}
 table.ph td{border:1px solid var(--grid);padding:0 8px;height:40px;text-align:center;white-space:nowrap}
 table.ph td.eqn{font-weight:800;background:#f1f5f9;font-size:15.5px;color:#0f172a}
 table.ph td.area{color:#1e293b;background:#f8fafc;font-weight:700}
@@ -76,7 +75,7 @@ table.ph td.in{width:52px;padding:0 4px;background:#fafbff}
 table.ph td.d{min-width:88px;font-variant-numeric:tabular-nums;font-size:15px;font-weight:700}
 table.ph td.d.rep{background:var(--rep);color:var(--rep-t)}
 table.ph td.d.cln{background:var(--cln);color:var(--cln-t)}
-table.ph td.d.latest{background:#fff1a8;box-shadow:inset 0 0 0 3px #f59e0b;font-weight:800}
+table.ph td.d.latest{box-shadow:inset 0 0 0 3px rgba(37,99,235,.6);font-weight:800}
 table.ph td.d[data-i]{cursor:pointer;position:relative}
 table.ph td.d[data-i]:hover{filter:brightness(.92);outline:2px solid var(--pri);outline-offset:-2px}
 table.ph td.d.memo::after{content:"";position:absolute;top:0;right:0;border-left:11px solid transparent;border-top:11px solid #ef4444}
@@ -201,7 +200,7 @@ tr.dragging{opacity:.45;background:#eef4ff}
     </div>
     <div class="tablearea"></div>
     <div class="legend">
-      <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
+      <span><b style="background:#fff;box-shadow:inset 0 0 0 2px rgba(37,99,235,.7)"></b>가장 최근</span>
       <span><b style="background:var(--rep);border:1px solid #86efac"></b>교체 (YYMMDD)</span>
       <span><b style="background:var(--cln);border:1px solid #93c5fd"></b>CLN (YYMMDD CLN)</span>
       <span>· 입력 칸의 🖱 버튼 = 이력 추가</span>
@@ -224,7 +223,7 @@ tr.dragging{opacity:.45;background:#eef4ff}
     </div>
     <div class="tablearea"></div>
     <div class="legend">
-      <span><b style="background:#fff1a8;box-shadow:inset 0 0 0 2px #f59e0b"></b>가장 최근</span>
+      <span><b style="background:#fff;box-shadow:inset 0 0 0 2px rgba(37,99,235,.7)"></b>가장 최근</span>
       <span>· 입력 칸의 🖱 버튼 = 이력 추가</span>
       <span>· 기록된 날짜 클릭 = 메모 보기/작성 · 수정 · 삭제</span>
       <span><b style="background:linear-gradient(225deg,#ef4444 30%,#fff 30%);border:1px solid var(--line)"></b>메모 있음</span>
@@ -624,8 +623,8 @@ function buildTable(cat, eqList, cols, fixed){
   const mod = MODS[cat];
   const nFix = mod.heads.length + 1;   // + 입력 칸
   let h = `<table class="ph ${fixed ? 'fixed' : ''}"><thead>
-    <tr>${mod.heads.map(t => `<th rowspan="2">${t}</th>`).join('')}<th rowspan="2">입력</th><th colspan="${cols}">교체 일자 (최신 ←)</th></tr>
-    <tr>${Array.from({length: cols}, (_, i) => `<th class="dh ${i===0 ? 'latest-h' : ''}">${i===0 ? '1 (최신)' : i+1}</th>`).join('')}</tr>
+    <tr>${mod.heads.map(t => `<th rowspan="2">${t}</th>`).join('')}<th rowspan="2">입력</th><th colspan="${cols}">교체 일자</th></tr>
+    <tr>${Array.from({length: cols}, (_, i) => `<th class="dh">${i+1}</th>`).join('')}</tr>
   </thead><tbody>`;
   for(const eq of eqList){
     const rows = mod.rows(eq);
@@ -919,14 +918,13 @@ function analyzeImport(cat, text, opt){
     }
     const ents = [], bad = [];
     for(let j = L; j < r.length; j++){ const p = parseDateCell(r[j]); ents.push(...p.dates); bad.push(...p.bad); }
-    const row = { eqLabel: eqN || opt.defEq || '', area, item, ents: ents.map(e => mkEntry(mod, e.d, e.t)), bad };
+    const row = { eqLabel: eqN || '', area, item, ents: ents.map(e => mkEntry(mod, e.d, e.t)), bad };
     res.rows.push(row);
     // 설비 찾기
-    if(!row.eqLabel){ row.err = '설비명 없음 (위에서 기본 설비 선택)'; continue; }
+    if(!row.eqLabel){ row.err = '설비명 없음'; continue; }
     let eq = eqByName(row.eqLabel);
     if(!eq){
-      if(opt.autoEq && opt.autoPrc){ eq = { name: row.eqLabel, prc: opt.autoPrc }; res.newEq.push(eq); row.newEq = true; }
-      else { row.err = `등록 안 된 설비: ${row.eqLabel}`; continue; }
+      row.err = `등록 안 된 설비: ${row.eqLabel} (🛠 설비 추가/제거에서 먼저 추가)`; continue;
     }
     row.eq = eq.name;
     if(!item){ row.err = '항목명 없음'; continue; }
@@ -969,12 +967,6 @@ function analyzeImport(cat, text, opt){
 
 function openImportModal(cat){
   const mod = MODS[cat];
-  const sel = ui.sel[cat];
-  const defEq = sel && sel.type === 'eq' ? sel.name : '';
-  const eqOpts = allPrcs().map(p => {
-    const l = eqOfPrc(p); if(!l.length) return '';
-    return `<optgroup label="${esc(p)}">${l.map(e => `<option value="${esc(e.name)}" ${e.name === defEq ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>`;
-  }).join('');
   const example = cat === 'pm'
     ? '설비명\t부위\t항목\t교체일자\t\t\nIAH3701\tBeamline\tAMU\t260910\t260530 CLN\t260417\n\tSource\tFilament\t260801\t\t'
     : '설비 호기\tPump 명\t일자\t\nIAH3701\tCP09\t260910\t250101\n\tCP10\t250814\t';
@@ -983,11 +975,9 @@ function openImportModal(cat){
     title: `📥 엑셀 붙여넣기 — ${cat === 'pm' ? 'PM Part' : 'Cryo Pump'}`, wide: 'wide',
     body: `
       <div class="note" style="margin-bottom:12px">엑셀에서 표 범위를 복사(Ctrl+C)해서 아래 칸에 붙여넣기(Ctrl+V) 하세요. 제목 줄은 같이 복사해도 자동으로 건너뜁니다.<br>
-        형태: <b>${cat === 'pm' ? '설비명 | 부위 | 항목 | 날짜…' : '설비 호기 | Pump 명 | 날짜…'}</b> — 앞쪽 칸(설비명${cat === 'pm' ? '·부위' : ''})은 없어도 됩니다. 병합된 칸은 윗줄 값을 이어 씁니다.</div>
+        형태: <b>${cat === 'pm' ? '설비명 | 부위 | 항목 | 날짜…' : '설비 호기 | Pump 명 | 날짜…'}</b> — 병합된 칸(빈칸)은 윗줄 값을 이어 씁니다. 아래 미리보기에서 각 줄이 어디에 추가되는지 확인 후 업로드하세요.</div>
       <div class="opts">
-        <label>설비명 칸이 없을 때 쓸 기본 설비 <select id="ipDef"><option value="">(선택 안 함)</option>${eqOpts}</select></label>
         <label><input type="checkbox" id="ipAutoItem" checked> 목록에 없는 ${cat === 'pm' ? '항목은 자동 추가 (부위 칸이 없으면 「기타」)' : 'Pump는 자동 추가'}</label>
-        <label><input type="checkbox" id="ipAutoEq"> 등록 안 된 설비는 자동 추가 → PRC <select id="ipPrc">${allPrcs().map(p => `<option>${esc(p)}</option>`).join('')}</select></label>
       </div>
       <textarea id="ipText" placeholder="${esc(example)}"></textarea>
       <div class="isum" id="ipSum"></div>
@@ -998,8 +988,7 @@ function openImportModal(cat){
     ]
   });
   const el = m.el, upBtn = el.querySelector('.mf .pri');
-  const opt = () => ({ defEq: el.querySelector('#ipDef').value, autoItem: el.querySelector('#ipAutoItem').checked,
-                       autoEq: el.querySelector('#ipAutoEq').checked, autoPrc: el.querySelector('#ipPrc').value });
+  const opt = () => ({ autoItem: el.querySelector('#ipAutoItem').checked });
   function preview(){
     const text = el.querySelector('#ipText').value;
     const pv = el.querySelector('#ipPrev'), sum = el.querySelector('#ipSum');
@@ -1021,7 +1010,7 @@ function openImportModal(cat){
     upBtn.textContent = res.fresh ? `${res.fresh}건 업로드` : '업로드';
   }
   el.querySelector('#ipText').addEventListener('input', preview);
-  el.querySelectorAll('#ipDef, #ipAutoItem, #ipAutoEq, #ipPrc').forEach(x => x.addEventListener('change', preview));
+  el.querySelectorAll('#ipAutoItem').forEach(x => x.addEventListener('change', preview));
   upBtn.disabled = true;
   setTimeout(() => el.querySelector('#ipText').focus(), 30);
 
