@@ -164,7 +164,7 @@
       {
         "id": "p_mw4ym9xx81b6",
         "area": "Beamline",
-        "item": "Scanner G/P"
+        "item": "Scanner"
       },
       {
         "id": "p_mw4ymepn7n8m",
@@ -214,6 +214,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:04.809Z",
+  "updatedAt": "2026-11-06T12:39:10.258Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
