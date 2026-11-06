@@ -162,6 +162,11 @@
         "item": "SRA"
       },
       {
+        "id": "p_mw4yoq20egyw",
+        "area": "Beamline",
+        "item": "Beam Stopper"
+      },
+      {
         "id": "p_mw4yolw8xfln",
         "area": "Beamline",
         "item": "HSG"
@@ -180,11 +185,6 @@
         "id": "p_mw4ymepn7n8m",
         "area": "Beamline",
         "item": "Quad"
-      },
-      {
-        "id": "p_mw4yoq20egyw",
-        "area": "Beamline",
-        "item": "Beam Stopper"
       },
       {
         "id": "p_mw4ympynonqw",
@@ -229,6 +229,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:36.348Z",
+  "updatedAt": "2026-11-06T12:39:37.927Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
