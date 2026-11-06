@@ -195,6 +195,11 @@
         "id": "p_mw4yqvyychbl",
         "area": "기타",
         "item": "ATM Robot Teaching"
+      },
+      {
+        "id": "p_mw4yrayk9fq6",
+        "area": "기타",
+        "item": "POP-Off Test & ESC CAL"
       }
     ],
     "LE": [
@@ -234,6 +239,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:41:11.004Z",
+  "updatedAt": "2026-11-06T12:41:30.432Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
