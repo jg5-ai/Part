@@ -2,7 +2,7 @@
   "version": 1,
   "pm": {
     "IAH3701": {
-      "Beamline|AMU G/P": [
+      "Beamline|AMU": [
         {
           "d": "261106",
           "t": "CLN"
@@ -23,6 +23,6 @@
     }
   },
   "cryo": {},
-  "updatedAt": "2026-11-06T12:35:06.148Z",
+  "updatedAt": "2026-11-06T12:39:01.397Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
