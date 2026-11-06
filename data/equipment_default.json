@@ -106,6 +106,10 @@
     {
       "name": "IAT3842",
       "prc": "LE"
+    },
+    {
+      "name": "IAT3843",
+      "prc": "LE"
     }
   ],
   "parts": {
@@ -153,6 +157,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:31:23.480Z",
+  "updatedAt": "2026-11-06T12:31:25.346Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
