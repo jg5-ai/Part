@@ -137,6 +137,22 @@ tr.dragging{opacity:.45;background:#eef4ff}
 .hlist .empty{padding:14px;color:var(--sub);text-align:center}
 .editbar{background:#fff7e0;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:14px;font-weight:700;color:#92400e;display:flex;align-items:center;gap:8px}
 .note{font-size:13px;color:var(--sub);line-height:1.65}
+.modal textarea{width:100%;min-height:150px;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;border:1px solid var(--line);border-radius:8px;padding:10px;outline:none;resize:vertical;white-space:pre;overflow:auto}
+.modal textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-soft)}
+.ipv{border:1px solid var(--line);border-radius:10px;max-height:320px;overflow:auto}
+.ipv table{border-collapse:collapse;width:100%;font-size:13.5px}
+.ipv th{position:sticky;top:0;background:#f1f5f9;text-align:left;padding:7px 8px;font-size:12.5px;color:#334155;border-bottom:1px solid var(--line)}
+.ipv td{padding:6px 8px;border-bottom:1px solid var(--line2);vertical-align:top}
+.ipv td.ds{font-variant-numeric:tabular-nums;white-space:normal;line-height:1.7}
+.ipv .chip2{display:inline-block;padding:0 6px;border-radius:5px;margin:1px 3px 1px 0;font-weight:700;font-size:12.5px;background:var(--rep);color:var(--rep-t)}
+.ipv .chip2.cln{background:var(--cln);color:var(--cln-t)}
+.ipv .chip2.dup{background:#f1f5f9;color:#94a3b8;text-decoration:line-through}
+.ipv tr.bad td{background:#fef2f2}
+.ipv .st-ok{color:#15803d;font-weight:700}.ipv .st-bad{color:var(--danger);font-weight:700}.ipv .st-new{color:#b45309;font-weight:700}
+.isum{margin:10px 0 0;font-size:14.5px;font-weight:700}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;font-size:14px}
+.opts label{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.opts input[type=checkbox]{width:18px;height:18px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fade .15s;max-width:90vw}
 .toast.err{background:#b91c1c}
 @media (max-width:640px){header{padding:10px 12px}.sync{margin-left:0;width:100%}.cats,main{padding-left:10px;padding-right:10px}.cat{flex:1;padding:9px 6px;font-size:13px}}
@@ -168,6 +184,7 @@ tr.dragging{opacity:.45;background:#eef4ff}
         <button data-do="eq">🛠 설비 추가/제거</button>
         <button data-do="parts">📋 부위/항목 관리</button>
         <button data-do="old">🕘 예전 이력 보기</button>
+        <button data-do="import">📥 엑셀 붙여넣기</button>
         <span class="info" data-info></span>
       </div>
       <div class="eqgroups"></div>
@@ -188,6 +205,7 @@ tr.dragging{opacity:.45;background:#eef4ff}
         <button data-do="eq">🛠 설비 추가/제거</button>
         <button data-do="pumps">🔧 Pump 추가/제거</button>
         <button data-do="old">🕘 예전 이력 보기</button>
+        <button data-do="import">📥 엑셀 붙여넣기</button>
         <span class="info" data-info></span>
       </div>
       <div class="eqgroups"></div>
@@ -285,6 +303,18 @@ if(!cfg.owner && /\.github\.io$/i.test(location.hostname)){         // github.io
   const seg = location.pathname.split('/').filter(Boolean)[0];
   if(seg && !/\.html?$/i.test(seg)) cfg.repo = seg;
 }
+/* API 주소 자동 보정: 사이트 주소(github.io)나 github.com을 넣어도 올바른 API 주소로 바꿔줌 */
+function fixApi(s){
+  s = String(s || '').trim();
+  if(!s) return DEFAULT_CONFIG.apiBase;
+  if(!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  let u; try{ u = new URL(s); }catch(e){ return s.replace(/\/+$/,''); }
+  const host = u.hostname.toLowerCase();
+  if(host === 'api.github.com' || host === 'github.com' || host === 'www.github.com' || host.endsWith('.github.io')) return 'https://api.github.com';
+  if(/\/api\/v3/.test(u.pathname)) return u.origin + '/api/v3';
+  return u.origin + '/api/v3';           // 사내 GitHub(Enterprise)
+}
+cfg.apiBase = fixApi(cfg.apiBase);
 let token = lsGet('token', '');
 let userName = lsGet('user', '');
 const isRemote = () => !!(token && cfg.owner && cfg.repo);
@@ -301,6 +331,8 @@ const EMPTY = {
    저장소(백엔드) — GitHub API 또는 로컬(이 브라우저에만 저장)
    ===================================================================== */
 function httpErr(status, text){ const e = new Error(`HTTP ${status}`); e.status = status; e.body = text; return e; }
+async function ghMsg(r){ try{ const j = await r.clone().json(); return j.message ? `(${j.message})` : ''; }catch(e){ return ''; } }
+function ghBodyMsg(e){ try{ const j = JSON.parse(e.body); return j.message || ''; }catch(_){ return ''; } }
 
 const ghBackend = {
   url(path){
@@ -431,13 +463,13 @@ async function flush(key, op){
       lastErr = e;
       if(e.conflict){ try{ await reload(key); }catch(_){} await sleep(300 + Math.random()*700); continue; }
       if(e.status === 401 || e.status === 403 || e.status === 404) break;   // 권한 문제는 재시도 의미 없음
-      setStatus('err', '저장 실패 – 재시도 중…');
+      setStatus('err', `저장 실패 – 재시도 중… (${e.status ? 'HTTP ' + e.status : '네트워크'})`);
       await sleep(1500 * (attempt + 1));
     }
   }
   s.pending.splice(s.pending.indexOf(op), 1);
   rebuild(key); render();
-  const why = lastErr && lastErr.status ? errText(lastErr.status) : '네트워크 오류';
+  const why = lastErr && lastErr.status ? `${errText(lastErr.status)} ${ghBodyMsg(lastErr)}`.trim() : `네트워크 오류 (${lastErr ? lastErr.message : ''} · API 주소: ${cfg.apiBase})`;
   setStatus('err', `저장 실패 (${why})`);
   toast(`저장 실패: ${op.msg} — ${why}`, true);
 }
@@ -634,7 +666,7 @@ document.addEventListener('click', e => {
   const tb = e.target.closest('.toolbar [data-do]');
   if(tb){
     const cat = tb.closest('section').id.replace('sec-', '');
-    ({ eq: openEqModal, parts: openPartsModal, pumps: openPumpModal, old: () => openOldModal(cat) })[tb.dataset.do]();
+    ({ eq: openEqModal, parts: openPartsModal, pumps: openPumpModal, old: () => openOldModal(cat), import: () => openImportModal(cat) })[tb.dataset.do]();
   }
 });
 $('#btnSettings').onclick = openSettings;
@@ -781,6 +813,235 @@ function openOldModal(cat){
   });
   m.el.querySelector('.modal').style.maxWidth = width + 'px';
   renderFullHist(cat, m.el.querySelector('[data-fullhist]'));
+}
+
+
+/* =====================================================================
+   📥 엑셀 붙여넣기 (기존 이력 한꺼번에 옮기기)
+   지원하는 형태 (엑셀에서 범위 복사 → 붙여넣기):
+     설비명 | 부위 | 항목 | 날짜 | 날짜 | ...      (PM Part)
+     설비명 | Pump명 | 날짜 | 날짜 | ...           (Cryo Pump)
+     항목 | 날짜 | 날짜 ...  (설비명 없으면 위에서 고른 기본 설비)
+   - 병합된 셀(빈칸)은 위 행 값을 이어 씀
+   - 날짜: 260910 / 26.09.10 / 2026-09-10 / 2026. 9. 10.
+   - CLN: "260910 CLN", "260910 Clean", "260910 클린" → CLN, 나머지는 교체
+   - 한 칸에 "260910 / 260530 CLN" 처럼 여러 날짜도 가능
+   ===================================================================== */
+function parseTable(text){
+  text = String(text || '').replace(/\r\n?/g, '\n');
+  let rows = [];
+  if(text.includes('\t')){
+    let row = [], cell = '', q = false;
+    for(let i = 0; i < text.length; i++){
+      const c = text[i];
+      if(q){ if(c === '"'){ if(text[i+1] === '"'){ cell += '"'; i++; } else q = false; } else cell += c; }
+      else if(c === '"' && cell === ''){ q = true; }
+      else if(c === '\t'){ row.push(cell); cell = ''; }
+      else if(c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if(cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  }else{
+    // 탭이 없으면 " / " 또는 "|" 또는 칸 여러 개 띄우기로 구분
+    rows = text.split('\n').map(l => l.split(/\s+\/\s+|\s*\|\s*|\s{2,}/));
+  }
+  return rows.map(r => r.map(x => x.trim())).filter(r => r.some(x => x));
+}
+const TYPE_RE = /\(?\s*(cln|clean|cleaning|클린|세정|교체|replace|rep)\s*\)?/ig;
+function parseDateToken(tok){
+  const t = String(tok || '').trim(); if(!t) return null;
+  const type = /(cln|clean|클린|세정)/i.test(t) ? 'CLN' : '교체';
+  const d = normDate(t.replace(TYPE_RE, ' ').replace(/\s+/g, ' ').trim().replace(/\.$/, ''));
+  return d ? { d, t: type } : null;
+}
+function parseDateCell(cell){
+  const out = { dates: [], bad: [] };
+  for(const tok of String(cell || '').split(/\s+\/\s+|[,;\n]+/)){
+    if(!tok.trim()) continue;
+    const r = parseDateToken(tok);
+    if(r) out.dates.push(r); else out.bad.push(tok.trim());
+  }
+  return out;
+}
+const isDateCell = c => { if(!c) return false; const r = parseDateCell(c); return r.dates.length > 0 && !r.bad.length; };
+const lc = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+function analyzeImport(cat, text, opt){
+  const mod = MODS[cat];
+  const rows = parseTable(text);
+  const res = { rows: [], newEq: [], newParts: {}, newPumps: {}, total: 0, fresh: 0, errors: 0 };
+  if(!rows.length) return res;
+  // 이름 칸 개수(L) = 날짜가 처음 나오는 칸 위치의 최솟값
+  let L = Infinity;
+  for(const r of rows){ const i = r.findIndex(isDateCell); if(i >= 0) L = Math.min(L, i); }
+  if(!isFinite(L)){ res.rows.push({ err: '날짜를 찾지 못했습니다' }); res.errors = 1; return res; }
+  const eqByName = n => EQ().equipment.find(e => lc(e.name) === lc(n)) || res.newEq.find(e => lc(e.name) === lc(n));
+  // PM에서 이름 칸이 2개면: 첫 칸이 설비명인지 부위인지 판단
+  const firstIsEq = rows.some(r => r.slice(0, L).length && eqByName(r[0]));
+  const prev = [];
+  const seen = new Set();
+  for(const r of rows){
+    const di = r.findIndex(isDateCell);
+    if(di < 0) continue;                     // 날짜 없는 행(제목 줄 등)은 건너뜀
+    const labels = [];
+    for(let j = 0; j < L; j++){ const v = (r[j] || '').trim(); labels[j] = v || prev[j] || ''; }
+    labels.forEach((v, j) => prev[j] = v);
+    let eqN = '', area = '', item = '';
+    if(cat === 'pm'){
+      if(L >= 3){ eqN = labels[L-3]; area = labels[L-2]; item = labels[L-1]; }
+      else if(L === 2){ if(firstIsEq) eqN = labels[0]; else area = labels[0]; item = labels[1]; }
+      else if(L === 1) item = labels[0];
+    }else{
+      if(L >= 2){ eqN = labels[L-2]; item = labels[L-1]; }
+      else if(L === 1) item = labels[0];
+    }
+    const ents = [], bad = [];
+    for(let j = L; j < r.length; j++){ const p = parseDateCell(r[j]); ents.push(...p.dates); bad.push(...p.bad); }
+    const row = { eqLabel: eqN || opt.defEq || '', area, item, ents: ents.map(e => mkEntry(mod, e.d, e.t)), bad };
+    res.rows.push(row);
+    // 설비 찾기
+    if(!row.eqLabel){ row.err = '설비명 없음 (위에서 기본 설비 선택)'; continue; }
+    let eq = eqByName(row.eqLabel);
+    if(!eq){
+      if(opt.autoEq && opt.autoPrc){ eq = { name: row.eqLabel, prc: opt.autoPrc }; res.newEq.push(eq); row.newEq = true; }
+      else { row.err = `등록 안 된 설비: ${row.eqLabel}`; continue; }
+    }
+    row.eq = eq.name;
+    if(!item){ row.err = '항목명 없음'; continue; }
+    // 항목/Pump 찾기
+    if(cat === 'pm'){
+      const parts = (EQ().parts[eq.prc] || []).concat(res.newParts[eq.prc] || []);
+      let c = parts.filter(p => lc(p.item) === lc(item));
+      if(area && c.length > 1) c = c.filter(p => lc(p.area) === lc(area));
+      if(area && c.length === 1 && lc(c[0].area) !== lc(area)){
+        const exact = parts.find(p => lc(p.area) === lc(area) && lc(p.item) === lc(item)); if(exact) c = [exact];
+      }
+      if(c.length > 1){ row.err = `「${item}」 이 여러 부위에 있음 → 부위 칸 필요`; continue; }
+      if(!c.length){
+        if(opt.autoItem){ const np = { id: uid('p'), area: area || '기타', item }; (res.newParts[eq.prc] = res.newParts[eq.prc] || []).push(np); c = [np]; row.newItem = true; }
+        else { row.err = `${eq.prc}에 없는 항목: ${area ? area + ' / ' : ''}${item}`; continue; }
+      }
+      row.key = partKey(c[0]); row.title = `${c[0].area} · ${c[0].item}`;
+    }else{
+      const pumps = (EQ().pumps[eq.prc] || []).concat(res.newPumps[eq.prc] || []);
+      let pn = pumps.find(n => lc(n) === lc(item));
+      if(!pn){
+        if(opt.autoItem){ pn = item; (res.newPumps[eq.prc] = res.newPumps[eq.prc] || []).push(pn); row.newItem = true; }
+        else { row.err = `${eq.prc}에 없는 Pump: ${item}`; continue; }
+      }
+      row.key = pn; row.title = pn;
+    }
+    if(!row.ents.length){ row.err = '날짜 없음'; continue; }
+    // 이미 있는 기록 / 붙여넣기 안에서 중복 표시
+    const exist = getEntries(mod.hk, row.eq, row.key);
+    row.ents.forEach(e => {
+      const k = `${row.eq}\u0000${row.key}\u0000${e.d}\u0000${e.t || ''}`;
+      e.dup = exist.some(x => sameEntry(x, e)) || seen.has(k);
+      seen.add(k);
+      res.total++; if(!e.dup) res.fresh++;
+    });
+  }
+  res.errors = res.rows.filter(r => r.err).length;
+  return res;
+}
+
+function openImportModal(cat){
+  const mod = MODS[cat];
+  const sel = ui.sel[cat];
+  const defEq = sel && sel.type === 'eq' ? sel.name : '';
+  const eqOpts = allPrcs().map(p => {
+    const l = eqOfPrc(p); if(!l.length) return '';
+    return `<optgroup label="${esc(p)}">${l.map(e => `<option value="${esc(e.name)}" ${e.name === defEq ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>`;
+  }).join('');
+  const example = cat === 'pm'
+    ? '설비명\t부위\t항목\t교체일자\t\t\nIAH3701\tBeamline\tAMU\t260910\t260530 CLN\t260417\n\tSource\tFilament\t260801\t\t'
+    : '설비 호기\tPump 명\t일자\t\nIAH3701\tCP09\t260910\t250101\n\tCP10\t250814\t';
+  let res = null;
+  const m = openModal({
+    title: `📥 엑셀 붙여넣기 — ${cat === 'pm' ? 'PM Part' : 'Cryo Pump'}`, wide: 'wide',
+    body: `
+      <div class="note" style="margin-bottom:12px">엑셀에서 표 범위를 복사(Ctrl+C)해서 아래 칸에 붙여넣기(Ctrl+V) 하세요. 제목 줄은 같이 복사해도 자동으로 건너뜁니다.<br>
+        형태: <b>${cat === 'pm' ? '설비명 | 부위 | 항목 | 날짜…' : '설비 호기 | Pump 명 | 날짜…'}</b> — 앞쪽 칸(설비명${cat === 'pm' ? '·부위' : ''})은 없어도 됩니다. 병합된 칸은 윗줄 값을 이어 씁니다.</div>
+      <div class="opts">
+        <label>설비명 칸이 없을 때 쓸 기본 설비 <select id="ipDef"><option value="">(선택 안 함)</option>${eqOpts}</select></label>
+        <label><input type="checkbox" id="ipAutoItem" checked> 목록에 없는 ${cat === 'pm' ? '항목은 자동 추가 (부위 칸이 없으면 「기타」)' : 'Pump는 자동 추가'}</label>
+        <label><input type="checkbox" id="ipAutoEq"> 등록 안 된 설비는 자동 추가 → PRC <select id="ipPrc">${allPrcs().map(p => `<option>${esc(p)}</option>`).join('')}</select></label>
+      </div>
+      <textarea id="ipText" placeholder="${esc(example)}"></textarea>
+      <div class="isum" id="ipSum"></div>
+      <div class="ipv" id="ipPrev" style="margin-top:8px;display:none"></div>`,
+    buttons: [
+      { text: '취소' },
+      { text: '업로드', cls: 'pri', onClick: () => doUpload() }
+    ]
+  });
+  const el = m.el, upBtn = el.querySelector('.mf .pri');
+  const opt = () => ({ defEq: el.querySelector('#ipDef').value, autoItem: el.querySelector('#ipAutoItem').checked,
+                       autoEq: el.querySelector('#ipAutoEq').checked, autoPrc: el.querySelector('#ipPrc').value });
+  function preview(){
+    const text = el.querySelector('#ipText').value;
+    const pv = el.querySelector('#ipPrev'), sum = el.querySelector('#ipSum');
+    if(!text.trim()){ pv.style.display = 'none'; sum.textContent = ''; upBtn.disabled = true; upBtn.textContent = '업로드'; res = null; return; }
+    res = analyzeImport(cat, text, opt());
+    const nE = res.newEq.length, nI = Object.values(cat === 'pm' ? res.newParts : res.newPumps).reduce((a, b) => a + b.length, 0);
+    sum.innerHTML = `새로 올라갈 이력 <span style="color:var(--pri)">${res.fresh}건</span>`
+      + (res.total - res.fresh ? ` · 이미 있음/중복 ${res.total - res.fresh}건(건너뜀)` : '')
+      + (res.errors ? ` · <span style="color:var(--danger)">오류 ${res.errors}줄(건너뜀)</span>` : '')
+      + (nE ? ` · 새 설비 ${nE}대` : '') + (nI ? ` · 새 ${cat === 'pm' ? '항목' : 'Pump'} ${nI}개` : '');
+    pv.style.display = '';
+    pv.innerHTML = `<table><tr><th>#</th><th>설비</th><th>${cat === 'pm' ? '부위 · 항목' : 'Pump'}</th><th>날짜 (회색 = 이미 있음)</th><th>상태</th></tr>
+      ${res.rows.slice(0, 500).map((r, i) => `<tr class="${r.err ? 'bad' : ''}"><td>${i+1}</td>
+        <td>${esc(r.eq || r.eqLabel || '-')}${r.newEq ? ' <span class="st-new">(새 설비)</span>' : ''}</td>
+        <td>${esc(r.title || [r.area, r.item].filter(Boolean).join(' · ') || '-')}${r.newItem ? ' <span class="st-new">(새로 추가)</span>' : ''}</td>
+        <td class="ds">${(r.ents || []).map(e => `<span class="chip2 ${e.t === 'CLN' ? 'cln' : ''} ${e.dup ? 'dup' : ''}">${esc(entryText(e))}</span>`).join('')}${r.bad && r.bad.length ? `<br><span class="st-bad">인식 못 함: ${esc(r.bad.join(', '))}</span>` : ''}</td>
+        <td>${r.err ? `<span class="st-bad">${esc(r.err)}</span>` : '<span class="st-ok">OK</span>'}</td></tr>`).join('')}</table>`;
+    upBtn.disabled = !res.fresh;
+    upBtn.textContent = res.fresh ? `${res.fresh}건 업로드` : '업로드';
+  }
+  el.querySelector('#ipText').addEventListener('input', preview);
+  el.querySelectorAll('#ipDef, #ipAutoItem, #ipAutoEq, #ipPrc').forEach(x => x.addEventListener('change', preview));
+  upBtn.disabled = true;
+  setTimeout(() => el.querySelector('#ipText').focus(), 30);
+
+  function doUpload(){
+    if(!res || !res.fresh) return false;
+    const r = res, hk = mod.hk;
+    const newEq = r.newEq.filter(e => r.rows.some(x => !x.err && x.eq === e.name));
+    const hasNew = newEq.length || Object.keys(r.newParts).length || Object.keys(r.newPumps).length;
+    if(hasNew){
+      commit('eq', d => {
+        for(const e of newEq) if(!d.equipment.some(x => lc(x.name) === lc(e.name))) d.equipment.push({ name: e.name, prc: e.prc });
+        for(const P in r.newParts){
+          d.parts[P] = d.parts[P] || [];
+          for(const np of r.newParts[P]){
+            const a = d.parts[P];
+            if(a.some(p => lc(p.area) === lc(np.area) && lc(p.item) === lc(np.item))) continue;
+            let at = -1; a.forEach((p, i) => { if(p.area === np.area) at = i; });
+            if(at >= 0) a.splice(at + 1, 0, np); else a.push(np);
+          }
+          if(!d.prcList.includes(P)) d.prcList.push(P);
+        }
+        for(const P in r.newPumps){
+          d.pumps[P] = d.pumps[P] || [];
+          for(const n of r.newPumps[P]) if(!d.pumps[P].some(x => lc(x) === lc(n))) d.pumps[P].push(n);
+        }
+      }, `엑셀 붙여넣기: 설비/항목 자동 추가`);
+    }
+    const items = [];
+    for(const row of r.rows) if(!row.err) for(const e of row.ents) if(!e.dup) items.push({ eq: row.eq, key: row.key, e: mkEntry(mod, e.d, e.t) });
+    commit('hist', d => {
+      d[hk] = d[hk] || {};
+      const touched = new Set();
+      for(const it of items){
+        d[hk][it.eq] = d[hk][it.eq] || {};
+        const arr = d[hk][it.eq][it.key] = d[hk][it.eq][it.key] || [];
+        if(!arr.some(x => sameEntry(x, it.e))) arr.push(clone(it.e));
+        touched.add(arr);
+      }
+      touched.forEach(sortEntries);
+    }, `엑셀 붙여넣기 ${items.length}건 (${cat === 'pm' ? 'PM Part' : 'Cryo Pump'})`);
+    toast(`${items.length}건 업로드했습니다`);
+  }
 }
 
 /* =====================================================================
@@ -1074,16 +1335,17 @@ function openSettings(){
   function apply(){
     userName = v('#sUser'); lsSet('user', userName);
     token = v('#sToken'); lsSet('token', token);
-    cfg = Object.assign(cfg, { apiBase: v('#sApi') || DEFAULT_CONFIG.apiBase, owner: v('#sOwner'), repo: v('#sRepo'), branch: v('#sBranch') || 'main', profile: v('#sProfile') || 'default' });
+    cfg = Object.assign(cfg, { apiBase: fixApi(v('#sApi')), owner: v('#sOwner'), repo: v('#sRepo'), branch: v('#sBranch') || 'main', profile: v('#sProfile') || 'default' });
     lsSet('cfg', { apiBase: cfg.apiBase, owner: cfg.owner, repo: cfg.repo, branch: cfg.branch, profile: cfg.profile });
   }
   async function test(){
     const h = m.el.querySelector('#sHint');
     h.className = 'hint'; h.textContent = '확인 중…';
     try{
-      const r = await fetch(`${(v('#sApi')||DEFAULT_CONFIG.apiBase).replace(/\/+$/,'')}/repos/${encodeURIComponent(v('#sOwner'))}/${encodeURIComponent(v('#sRepo'))}`,
+      const api = fixApi(v('#sApi')); m.el.querySelector('#sApi').value = api;
+      const r = await fetch(`${api}/repos/${encodeURIComponent(v('#sOwner'))}/${encodeURIComponent(v('#sRepo'))}`,
         { headers: { 'Authorization': 'token ' + v('#sToken'), 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
-      if(!r.ok){ h.className = 'hint err'; h.textContent = `실패: ${errText(r.status)}`; return; }
+      if(!r.ok){ h.className = 'hint err'; h.textContent = `실패: ${errText(r.status)} ${await ghMsg(r)}`; return; }
       const j = await r.json();
       const canWrite = j.permissions ? j.permissions.push : undefined;
       h.className = canWrite === false ? 'hint err' : 'hint okk';
