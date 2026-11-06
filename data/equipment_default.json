@@ -165,6 +165,11 @@
         "id": "p_mw4ymepn7n8m",
         "area": "Beamline",
         "item": "Quad G/P"
+      },
+      {
+        "id": "p_mw4ympynonqw",
+        "area": "Chamber",
+        "item": "PEF G/P"
       }
     ],
     "LE": [
@@ -204,6 +209,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:37:42.014Z",
+  "updatedAt": "2026-11-06T12:37:56.594Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
