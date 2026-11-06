@@ -192,6 +192,11 @@
         "item": "PEF"
       },
       {
+        "id": "p_mw4ys0g0ggiu",
+        "area": "Chamber",
+        "item": "Left Dose Cup"
+      },
+      {
         "id": "p_mw4yqvyychbl",
         "area": "기타",
         "item": "ATM Robot Teaching"
@@ -239,6 +244,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:41:30.432Z",
+  "updatedAt": "2026-11-06T12:42:03.463Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
