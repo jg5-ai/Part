@@ -160,6 +160,11 @@
         "id": "p_mw4ym9xx81b6",
         "area": "Beamline",
         "item": "Scanner G/P"
+      },
+      {
+        "id": "p_mw4ymepn7n8m",
+        "area": "Beamline",
+        "item": "Quad G/P"
       }
     ],
     "LE": [
@@ -199,6 +204,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:37:35.833Z",
+  "updatedAt": "2026-11-06T12:37:42.014Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
