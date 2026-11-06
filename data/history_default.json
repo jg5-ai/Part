@@ -1,7 +1,16 @@
 {
   "version": 1,
-  "pm": {},
+  "pm": {
+    "IAH3701": {
+      "Beamline|AMU": [
+        {
+          "d": "240111",
+          "t": "교체"
+        }
+      ]
+    }
+  },
   "cryo": {},
-  "updatedAt": null,
-  "updatedBy": ""
+  "updatedAt": "2026-11-06T12:28:44.442Z",
+  "updatedBy": "jg5.kang@gmail.com"
 }
