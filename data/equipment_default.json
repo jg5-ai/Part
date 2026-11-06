@@ -190,6 +190,11 @@
         "id": "p_mw4ympynonqw",
         "area": "Chamber",
         "item": "PEF"
+      },
+      {
+        "id": "p_mw4yqvyychbl",
+        "area": "기타",
+        "item": "ATM Robot Teaching"
       }
     ],
     "LE": [
@@ -229,6 +234,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:37.927Z",
+  "updatedAt": "2026-11-06T12:41:11.004Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
