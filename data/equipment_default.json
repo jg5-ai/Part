@@ -70,6 +70,10 @@
     {
       "name": "IAT3745",
       "prc": "LE"
+    },
+    {
+      "name": "IAT3746",
+      "prc": "LE"
     }
   ],
   "parts": {
@@ -117,6 +121,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:30:31.796Z",
+  "updatedAt": "2026-11-06T12:30:33.419Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
