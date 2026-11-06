@@ -162,6 +162,11 @@
         "item": "Corrector"
       },
       {
+        "id": "p_mw4yoismmrhq",
+        "area": "Beamline",
+        "item": "SRA"
+      },
+      {
         "id": "p_mw4ym9xx81b6",
         "area": "Beamline",
         "item": "Scanner"
@@ -170,11 +175,6 @@
         "id": "p_mw4ymepn7n8m",
         "area": "Beamline",
         "item": "Quad"
-      },
-      {
-        "id": "p_mw4yoismmrhq",
-        "area": "Beamline",
-        "item": "SRA"
       },
       {
         "id": "p_mw4yolw8xfln",
@@ -229,6 +229,6 @@
       "CP09"
     ]
   },
-  "updatedAt": "2026-11-06T12:39:30.028Z",
+  "updatedAt": "2026-11-06T12:39:32.418Z",
   "updatedBy": "jg5.kang@gmail.com"
 }
